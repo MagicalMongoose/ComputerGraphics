@@ -7,6 +7,7 @@ var drawAlt = 1;  // choose patten for display, mouse click
 var debug = true;
 var x;
 var y;
+var count = 0;
 
 function main()
 {
@@ -125,8 +126,9 @@ function generatePoints( presetValues, x, y )
     //general form of the series: 
     x = (a*tempX) + (b*y) + e;
     y = (c*tempX) + (d*y) + f;
-    points.push( x, y );
-    //console.log(x, y);
+    points.push(vec2(x, y));
+    count++;
+    if (debug) {console.log("x y: ", x, y);}
 }
 
 //recursively draw fern
@@ -157,11 +159,11 @@ function render()
     //{
         gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
         
-        gl.drawArrays(gl.POINTS, 0, 1000);
+        gl.drawArrays(gl.LINES, 0, count);
     //}
     //else 
     //{
         gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
-        gl.drawArrays(gl.TRIANGLES, 0, 1000);
+        gl.drawArrays(gl.LINES, 0, count);
     //}
 }
