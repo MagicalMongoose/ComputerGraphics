@@ -1,7 +1,8 @@
 var canvas, gl;
 var program;
 var points = [];
-var depth = 5; // 3^depth = number of points in the fern
+var branches = 3;
+var depth = 7; // branches^depth = number of points in the fern
 var color = 1;      // choose color for display, press key 'c'
 var drawAlt = 1;  // choose patten for display, mouse click
 var debug = true;
@@ -31,10 +32,14 @@ function main()
     ]
         //probability ranges
         //(0-0.1) (0.1-0.18) (0.18-0.26) (0.26-1)
+        //set 0: stem
+        //set 1: successively smaller leaflets
+        //set 2: largest left-hand leaflets
+        //set 3: largest right-hand leaflets
     
     //primary function
     fern(presetValues, x, y, depth);
-
+    
     //  Configure WebGL
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
 
@@ -126,15 +131,20 @@ function generatePoints(presetValues)
     //general form of the series: 
     x = (a*tempX) + (b*y) + e;
     y = (c*tempX) + (d*y) + f;
+
     points.push(vec2(x, y));
+
     if (debug) {console.log("x y: ", x, y);}
 }
 
 //recursively draw fern
 function fern(presetValues, x, y, depth) 
 {
-    if (debug) {console.log("fern depth: " + depth);
-                console.log("x: " + x + " y: " + y);}
+    if (debug) 
+    {
+        console.log("fern depth: " + depth);
+        console.log("x: " + x + " y: " + y);
+    }
     //check for end of recursion
     if (depth === 0) 
     {generatePoints(presetValues);}
@@ -142,15 +152,16 @@ function fern(presetValues, x, y, depth)
     {
         --depth;
         
-        fern(presetValues, x, y, depth); //fern continue 
-        fern(presetValues, x, y, depth); //fern left
-        fern(presetValues, x, y, depth); //fern right
+        for (let i = 0; i < branches; i++)
+        {fern(presetValues, x, y, depth);}
     }
 }
 
 function render() 
 {
-    if (debug) {console.log(points);}
+    if (debug) 
+    {console.log(points);}
+    
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     /*if (drawAlt == 1)
