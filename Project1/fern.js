@@ -1,7 +1,7 @@
 var canvas, gl;
 var program;
 var points = [];
-var depth = 8; // 3^depth = number of points in the fern
+var depth = 5; // 3^depth = number of points in the fern
 var color = 1;      // choose color for display, press key 'c'
 var drawAlt = 1;  // choose patten for display, mouse click
 var debug = true;
@@ -112,20 +112,20 @@ function generatePoints(presetValues)
     var e = presetValues[4][set];
     var f = presetValues[5][set];
 
-    console.log("a: ", a);
-    console.log("b: ", b);
-    console.log("c: ", c);
-    console.log("d: ", d);
-    console.log("e: ", e);
-    console.log("f: ", f);
-
+    if (debug)
+    {
+        console.log("a: ", a);
+        console.log("b: ", b);
+        console.log("c: ", c);
+        console.log("d: ", d);
+        console.log("e: ", e);
+        console.log("f: ", f);
+    }
     
     var tempX = x; //use tempX so that y doesn't get the wrong x
     //general form of the series: 
     x = (a*tempX) + (b*y) + e;
     y = (c*tempX) + (d*y) + f;
-    //x = Math.random()*100;
-    //y = Math.random()*100;
     points.push(vec2(x, y));
     if (debug) {console.log("x y: ", x, y);}
 }
