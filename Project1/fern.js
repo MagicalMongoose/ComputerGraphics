@@ -1,13 +1,14 @@
 var canvas, gl;
 var program;
 var points = [];
-var branches = 3;
-var depth = 7; // branches^depth = number of points in the fern
+var branches = 4;
+var depth = 6; // branches^depth = number of points in the fern
 var color = 1;      // choose color for display, press key 'c'
 var drawAlt = 1;  // choose patten for display, mouse click
 var debug = true;
-var x;
-var y;
+var x, y;
+var nextX, nextY;
+var total = 30000;
 
 function main()
 {
@@ -18,6 +19,7 @@ function main()
 
     x = 0;
     y = 0;
+    points.push(vec2(x,y));
 
     //sets
     var presetValues = 
@@ -33,13 +35,13 @@ function main()
         //probability ranges
         //(0-0.1) (0.1-0.18) (0.18-0.26) (0.26-1)
         //set 0: stem
-        //set 1: successively smaller leaflets
-        //set 2: largest left-hand leaflets
-        //set 3: largest right-hand leaflets
+        //set 1: largest left-hand leaflets
+        //set 2: largest right-hand leaflets
+        //set 3: successively smaller leaflets
     
     //primary function
-    fern(presetValues, x, y, depth);
-    
+    //fern(presetValues, x, y, depth);
+    generatePoints(presetValues);
     //  Configure WebGL
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
 
@@ -109,33 +111,39 @@ function determineSet(presetValues)
 //generate a list of points that will be used to draw the fern
 function generatePoints(presetValues) 
 {
-    var set = determineSet(presetValues);
-    var a = presetValues[0][set];
-    var b = presetValues[1][set];
-    var c = presetValues[2][set];
-    var d = presetValues[3][set];
-    var e = presetValues[4][set];
-    var f = presetValues[5][set];
-
-    if (debug)
+    for (var i = 0; i < total; i++)
     {
-        console.log("a: ", a);
-        console.log("b: ", b);
-        console.log("c: ", c);
-        console.log("d: ", d);
-        console.log("e: ", e);
-        console.log("f: ", f);
+        var set = determineSet(presetValues);
+        var a = presetValues[0][set];
+        var b = presetValues[1][set];
+        var c = presetValues[2][set];
+        var d = presetValues[3][set];
+        var e = presetValues[4][set];
+        var f = presetValues[5][set];
+
+        if (debug)
+        {
+            console.log("a: ", a);
+            console.log("b: ", b);
+            console.log("c: ", c);
+            console.log("d: ", d);
+            console.log("e: ", e);
+            console.log("f: ", f);
+        }
+        
+        //general form of the series: 
+        nextX = (a*x) + (b*y) + e;
+        nextY = (c*x) + (d*y) + f;
+
+        x = nextX;
+        y = nextY/2;
+
+        points.push(vec2(x, y));
+
+        if (debug) {console.log("x y: ", x, y);}
     }
-    
-    var tempX = x; //use tempX so that y doesn't get the wrong x
-    //general form of the series: 
-    x = (a*tempX) + (b*y) + e;
-    y = (c*tempX) + (d*y) + f;
-
-    points.push(vec2(x, y));
-
-    if (debug) {console.log("x y: ", x, y);}
 }
+    
 
 //recursively draw fern
 function fern(presetValues, x, y, depth) 
@@ -174,6 +182,6 @@ function render()
     //else 
     //{
         gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
-        gl.drawArrays(gl.LINES, 0, points.length);
+        gl.drawArrays(gl.POINTS, 0, points.length);
     //}
 }
