@@ -8,7 +8,7 @@ var drawAlt = 1;  // choose patten for display, mouse click
 var debug = true;
 var x, y;
 var nextX, nextY;
-var total = 30000;
+var total = 10000;
 
 function main()
 {
@@ -22,7 +22,7 @@ function main()
     points.push(vec2(x,y));
 
     //sets
-    var presetValues = 
+    var presetValues1 = 
     [       //s0    s1    s2     s3
         /*a*/[0.0,  0.2,   -0.15, 0.75],
         /*b*/[0.0,  -0.26, 0.28,  0.04],
@@ -34,14 +34,28 @@ function main()
     ]
         //probability ranges
         //(0-0.1) (0.1-0.18) (0.18-0.26) (0.26-1)
+    
+        var presetValues2 = 
+        [       //s0    s1    s2     s3
+            /*a*/[0.0,  0.2,   -0.15, 0.85],
+            /*b*/[0.0,  -0.26, 0.28,  0.04],
+            /*c*/[0.0,  0.23,  0.26,  -0.04],
+            /*d*/[0.16, 0.22,  0.24,  0.85],
+            /*e*/[0.0,  0.0,   0.0,   0.0],
+            /*f*/[0.0,  1.6,   0.44,  1.6],
+            /*p*/[0.1,  0.17,  0.17,  0.65] //p[] sum == 1
+        ]
+        //probability ranges
+        //(0-0.1) (0.1-0.18) (0.18-0.26) (0.26-1)
+
         //set 0: stem
         //set 1: largest left-hand leaflets
         //set 2: largest right-hand leaflets
         //set 3: successively smaller leaflets
-    
+
     //primary function
     //fern(presetValues, x, y, depth);
-    generatePoints(presetValues);
+    generatePoints(presetValues1);
     //  Configure WebGL
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
 
@@ -59,11 +73,17 @@ function main()
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
-    /*
+    
     canvas.addEventListener("mousedown", function()
     {
         drawAlt = !drawAlt; //toggle which fern to render
+        
+        if (drawAlt == 1)
+            {generatePoints(presetValues1);}
+        else 
+            {generatePoints(presetValues2);}
         render();
+        console.log("mouse down detected, now using pattern: ", drawAlt);
     });
 
     // always return upper case letter
@@ -75,10 +95,11 @@ function main()
             {color = 0;}
         else
             {color = 1;}
+        console.log("switching to color ", color);
         render();
     }
     });
-    */
+    
 
     render();
 };
@@ -111,6 +132,7 @@ function determineSet(presetValues)
 //generate a list of points that will be used to draw the fern
 function generatePoints(presetValues) 
 {
+    points = []; //clear points array
     for (var i = 0; i < total; i++)
     {
         var set = determineSet(presetValues);
@@ -172,16 +194,6 @@ function render()
     
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    /*if (drawAlt == 1)
-    //{
-        gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
-        
-        gl.drawArrays(gl.LINES, 0, points.length);
-    //}
-    */
-    //else 
-    //{
-        gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
-        gl.drawArrays(gl.POINTS, 0, points.length);
-    //}
+    gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
+    gl.drawArrays(gl.POINTS, 0, points.length);
 }
