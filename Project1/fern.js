@@ -1,7 +1,7 @@
 var canvas, gl;
 var program;
 var points = [];
-var depth = 3; // 3^depth = number of points in the fern
+var depth = 8; // 3^depth = number of points in the fern
 var color = 1;      // choose color for display, press key 'c'
 var drawAlt = 1;  // choose patten for display, mouse click
 var debug = true;
@@ -27,7 +27,7 @@ function main()
         /*d*/[0.16, 0.22,  0.24,  0.85],
         /*e*/[0.0,  0.0,   0.0,   0.0],
         /*f*/[0.0,  1.6,   0.44,  1.6],
-        /*p*/[0.1,  0.08,  0.08,  0.74]
+        /*p*/[0.1,  0.08,  0.08,  0.74] //p[] sum == 1
     ]
         //probability ranges
         //(0-0.1) (0.1-0.18) (0.18-0.26) (0.26-1)
@@ -102,7 +102,7 @@ function determineSet(presetValues)
 }
 
 //generate a list of points that will be used to draw the fern
-function generatePoints( presetValues, x, y ) 
+function generatePoints(presetValues) 
 {
     var set = determineSet(presetValues);
     var a = presetValues[0][set];
@@ -118,7 +118,6 @@ function generatePoints( presetValues, x, y )
     console.log("d: ", d);
     console.log("e: ", e);
     console.log("f: ", f);
-
 
     
     var tempX = x; //use tempX so that y doesn't get the wrong x
@@ -136,9 +135,9 @@ function fern(presetValues, x, y, depth)
 {
     if (debug) {console.log("fern depth: " + depth);
                 console.log("x: " + x + " y: " + y);}
-    // check for end of recursion
-    if ( depth === 0 ) 
-    {generatePoints(presetValues, x, y, depth);}
+    //check for end of recursion
+    if (depth === 0) 
+    {generatePoints(presetValues);}
     else 
     {
         --depth;
@@ -154,15 +153,16 @@ function render()
     if (debug) {console.log(points);}
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    //if (drawAlt == 1)
+    /*if (drawAlt == 1)
     //{
         gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
         
         gl.drawArrays(gl.LINES, 0, points.length);
     //}
+    */
     //else 
     //{
         gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
-        gl.drawArrays(gl.POINTS, 0, points.length);
+        gl.drawArrays(gl.LINES, 0, points.length);
     //}
 }
