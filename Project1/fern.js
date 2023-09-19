@@ -1,13 +1,12 @@
 var canvas, gl;
 var program;
 var points = [];
-var depth = 5;
+var depth = 3; // 3^depth = number of points in the fern
 var color = 1;      // choose color for display, press key 'c'
 var drawAlt = 1;  // choose patten for display, mouse click
 var debug = true;
 var x;
 var y;
-var count = 0;
 
 function main()
 {
@@ -34,7 +33,7 @@ function main()
         //(0-0.1) (0.1-0.18) (0.18-0.26) (0.26-1)
     
     //primary function
-    fern( presetValues, x, y, depth);
+    fern(presetValues, x, y, depth);
 
     //  Configure WebGL
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -126,8 +125,9 @@ function generatePoints( presetValues, x, y )
     //general form of the series: 
     x = (a*tempX) + (b*y) + e;
     y = (c*tempX) + (d*y) + f;
+    //x = Math.random()*100;
+    //y = Math.random()*100;
     points.push(vec2(x, y));
-    count++;
     if (debug) {console.log("x y: ", x, y);}
 }
 
@@ -152,18 +152,17 @@ function fern(presetValues, x, y, depth)
 function render() 
 {
     if (debug) {console.log(points);}
-
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     //if (drawAlt == 1)
     //{
         gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
         
-        gl.drawArrays(gl.LINES, 0, count);
+        gl.drawArrays(gl.LINES, 0, points.length);
     //}
     //else 
     //{
         gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
-        gl.drawArrays(gl.LINES, 0, count);
+        gl.drawArrays(gl.POINTS, 0, points.length);
     //}
 }
