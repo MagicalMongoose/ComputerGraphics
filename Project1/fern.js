@@ -9,6 +9,7 @@ var debug = true;
 var x, y;
 var nextX, nextY;
 var total = 10000;
+var i = 0;
 
 function main()
 {
@@ -28,9 +29,9 @@ function main()
         /*b*/[0.0,  -0.26, 0.28,  0.04],
         /*c*/[0.0,  0.23,  0.26,  -0.04],
         /*d*/[0.16, 0.22,  0.24,  0.85],
-        /*e*/[0.0,  0.0,   0.0,   0.0],
+        /*e*/[0.01,  0.01,   0.01,   0.01],
         /*f*/[0.0,  1.6,   0.44,  1.6],
-        /*p*/[0.1,  0.08,  0.08,  0.74] //p[] sum == 1
+        /*p*/[0.01,  0.08,  0.08,  0.83] //p[] sum == 1
     ]
         //probability ranges
         //(0-0.1) (0.1-0.18) (0.18-0.26) (0.26-1)
@@ -73,7 +74,7 @@ function main()
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
-    
+    //update this to generate both on first load, and save both in buffer, rather than regenerating same data each time
     canvas.addEventListener("mousedown", function()
     {
         drawAlt = !drawAlt; //toggle which fern to render
@@ -133,7 +134,7 @@ function determineSet(presetValues)
 function generatePoints(presetValues) 
 {
     points = []; //clear points array
-    for (var i = 0; i < total; i++)
+    while (i < total)
     {
         var set = determineSet(presetValues);
         var a = presetValues[0][set];
@@ -143,7 +144,16 @@ function generatePoints(presetValues)
         var e = presetValues[4][set];
         var f = presetValues[5][set];
 
-        if (debug)
+        //general form of the series: 
+        nextX = (a*x) + (b*y) + e;
+        nextY = (c*x) + (d*y) + f/2;
+
+        x = nextX;
+        y = nextY/2;
+
+        points.push(vec2(x, y));
+
+        if (debug) 
         {
             console.log("a: ", a);
             console.log("b: ", b);
@@ -151,22 +161,13 @@ function generatePoints(presetValues)
             console.log("d: ", d);
             console.log("e: ", e);
             console.log("f: ", f);
+            console.log("x y: ", x, y);
         }
-        
-        //general form of the series: 
-        nextX = (a*x) + (b*y) + e;
-        nextY = (c*x) + (d*y) + f;
-
-        x = nextX;
-        y = nextY/2;
-
-        points.push(vec2(x, y));
-
-        if (debug) {console.log("x y: ", x, y);}
+        i++
     }
 }
     
-
+/*
 //recursively draw fern
 function fern(presetValues, x, y, depth) 
 {
@@ -186,6 +187,7 @@ function fern(presetValues, x, y, depth)
         {fern(presetValues, x, y, depth);}
     }
 }
+*/
 
 function render() 
 {
