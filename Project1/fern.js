@@ -1,8 +1,8 @@
 var canvas, gl;
 var program;
 var points = [];
-var branches = 4;
-var depth = 6; // branches^depth = number of points in the fern
+//var branches = 4;
+//var depth = 6; // branches^depth = number of points in the fern
 var color = 1;      // choose color for display, press key 'c'
 var drawAlt = 1;  // choose patten for display, mouse click
 var debug = true;
