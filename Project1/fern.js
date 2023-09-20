@@ -5,7 +5,7 @@ var points = [];
 //var depth = 6; // branches^depth = number of points in the fern
 var color = 1;      // choose color for display, press key 'c'
 var drawAlt = 1;  // choose patten for display, mouse click
-var debug = true;
+var debug = false;
 var x, y;
 var nextX, nextY;
 var total = 50000;
@@ -46,7 +46,7 @@ function main()
             /*d*/[0.16, 0.22,  0.24,  0.85],
             /*e*/[0.0,  0.0,   0.0,   0.0],
             /*f*/[0.0,  1.6,   0.44,  1.6],
-            /*p*/[0.1,  0.17,  0.17,  0.65] //p[] sum == 1
+            /*p*/[0.01,  0.07,  0.07,  0.85] //p[] sum == 1
         ]
         //probability ranges
         //(0-0.1) (0.1-0.18) (0.18-0.26) (0.26-1)
@@ -117,7 +117,7 @@ function determineSet(presetValues)
     if (debug) {console.log("rand: " + rand);}
     
     //structured like this to return as early as possible
-    if (rand < presetValues[6][0])
+    if (rand < (presetValues[6][0]))
     {setNum = 0;}
 
     else if (rand < (presetValues[6][1]) + (presetValues[6][0]))
@@ -179,12 +179,12 @@ function generatePoints(presetValues)
 
         if (debug) 
         {
-            console.log("a: ", a);
+            /*console.log("a: ", a);
             console.log("b: ", b);
             console.log("c: ", c);
             console.log("d: ", d);
             console.log("e: ", e);
-            console.log("f: ", f);
+            console.log("f: ", f);*/
             console.log("x y: ", x, y);
             console.log("xMax yMax: ", xMax, yMax);
             console.log("xMin yMin: ", xMin, yMin);
