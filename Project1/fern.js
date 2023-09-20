@@ -8,8 +8,10 @@ var drawAlt = 1;  // choose patten for display, mouse click
 var debug = true;
 var x, y;
 var nextX, nextY;
-var total = 100000;
+var total = 50000;
 var i = 0;
+var xMin, xMax = 0;
+var yMin, yMax = 0;
 
 function main()
 {
@@ -31,7 +33,7 @@ function main()
         /*d*/[0.16, 0.22,  0.24,  0.85],
         /*e*/[0.01,  0.01,   0.01,   0.01],
         /*f*/[0.0,  1.6,   0.44,  1.6],
-        /*p*/[0.01,  0.08,  0.08,  0.83] //p[] sum == 1
+        /*p*/[0.1,  0.08,  0.08,  0.74] //p[] sum == 1
     ]
         //probability ranges
         //(0-0.1) (0.1-0.18) (0.18-0.26) (0.26-1)
@@ -135,6 +137,11 @@ function determineSet(presetValues)
 function generatePoints(presetValues) 
 {
     points = []; //clear points array
+    xMin = 0;
+    xMax = 0;
+    yMin = 0;
+    yMax = 0;
+
     while (i < total)
     {
         var set = determineSet(presetValues);
@@ -149,10 +156,26 @@ function generatePoints(presetValues)
         nextX = (a*x) + (b*y) + e;
         nextY = (c*x) + (d*y) + f/3;
 
-        points.push(vec2(nextX, nextY));
+        //get the x/yMax 
+        if (nextX > xMax)
+        {xMax = nextX;}
+        if (nextY > yMax)
+        {yMax = nextY;}
 
+        //get the x/yMin
+        if (nextX < xMin)
+        {xMin = nextX;}
+        if (nextY < yMin)
+        {yMin = nextY;}
+        
+        //normalization
+        nextX = (nextX - xMin) / (xMax - xMin);
+        nextY = (nextY - yMin) / (yMax - yMin);
+        
         x = nextX;
         y = nextY;
+        
+        points.push(vec2(nextX, nextY));
 
         if (debug) 
         {
@@ -163,6 +186,8 @@ function generatePoints(presetValues)
             console.log("e: ", e);
             console.log("f: ", f);
             console.log("x y: ", x, y);
+            console.log("xMax yMax: ", xMax, yMax);
+            console.log("xMin yMin: ", xMin, yMin);
         }
         
         i++
