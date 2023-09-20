@@ -8,7 +8,7 @@ var drawAlt = 1;  // choose patten for display, mouse click
 var debug = true;
 var x, y;
 var nextX, nextY;
-var total = 10000;
+var total = 100000;
 var i = 0;
 
 function main()
@@ -74,6 +74,7 @@ function main()
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
+    /*
     //update this to generate both on first load, and save both in buffer, rather than regenerating same data each time
     canvas.addEventListener("mousedown", function()
     {
@@ -86,7 +87,7 @@ function main()
         render();
         console.log("mouse down detected, now using pattern: ", drawAlt);
     });
-
+    */
     // always return upper case letter
     window.addEventListener("keydown", function ()
     {
@@ -114,17 +115,17 @@ function determineSet(presetValues)
     if (debug) {console.log("rand: " + rand);}
     
     //structured like this to return as early as possible
-    if (rand >= (presetValues[6][2]) + (presetValues[6][1]) + (presetValues[6][0]))
-    {setNum = 3;}
+    if (rand < presetValues[6][0])
+    {setNum = 0;}
 
-    else if (rand >= (presetValues[6][1]) + (presetValues[6][0]))
-    {setNum = 2;}
-
-    else if (rand >= (presetValues[6][0]))
+    else if (rand < (presetValues[6][1]) + (presetValues[6][0]))
     {setNum = 1;}
 
-    else if (rand >= 0)
-    {setNum = 0;}
+    else if (rand < (presetValues[6][2]) + (presetValues[6][1]) + (presetValues[6][0]))
+    {setNum = 2;}
+
+    else
+    {setNum = 3;}
 
     if (debug) {console.log("setNum: " + setNum);}
     return setNum;
@@ -146,12 +147,12 @@ function generatePoints(presetValues)
 
         //general form of the series: 
         nextX = (a*x) + (b*y) + e;
-        nextY = (c*x) + (d*y) + f/2;
+        nextY = (c*x) + (d*y) + f/3;
+
+        points.push(vec2(nextX, nextY));
 
         x = nextX;
-        y = nextY/2;
-
-        points.push(vec2(x, y));
+        y = nextY;
 
         if (debug) 
         {
@@ -163,6 +164,7 @@ function generatePoints(presetValues)
             console.log("f: ", f);
             console.log("x y: ", x, y);
         }
+        
         i++
     }
 }
