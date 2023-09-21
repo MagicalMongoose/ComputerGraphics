@@ -154,7 +154,7 @@ function generatePoints(presetValues)
 
         //general form of the series: 
         nextX = (a*x) + (b*y) + e;
-        nextY = (c*x) + (d*y) + f;
+        nextY = (c*x) + (d*y) + f/3;
 
         //get the x/yMax 
         if (nextX > xMax)
