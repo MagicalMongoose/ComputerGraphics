@@ -51,7 +51,7 @@ function main()
 
     //primary function
     //fern(presetValues, x, y, depth);
-    points = generatePoints();//presetValues1);
+    points = generatePoints(presetValues1);
     console.log("points: ", points);
 
     //  Configure WebGL
@@ -176,7 +176,7 @@ function calculatePoint(presetValues, x, y)
 }
 
 //generate a list of points that will be used to draw the fern
-function generatePoints()//presetValues) 
+function generatePoints(presetValues) 
 {
     points = []; //clear points array
     let x = 0;
@@ -188,8 +188,19 @@ function generatePoints()//presetValues)
 
     for (let i = 0; i < total; i++)
     {
-        const r = Math.random();
+        var set = determineSet(presetValues);
+        var a = presetValues[0][set];
+        var b = presetValues[1][set];
+        var c = presetValues[2][set];
+        var d = presetValues[3][set];
+        var e = presetValues[4][set];
+        var f = presetValues[5][set];
 
+        //modular formula
+        let nextX = (a*x) + (b*y) + e;
+        let nextY = (c*x) + (d*y) + f;
+
+        /*
         let nextX, nextY;
 
         if (r <= 0.01) {
@@ -205,7 +216,8 @@ function generatePoints()//presetValues)
             nextX = -0.15 * x + 0.28 * y;
             nextY = 0.26 * x + 0.24 * y + 0.44;
         }
-        
+        */
+
         if (nextX > xMax)
         {xMax = nextX;}
         if (nextX < xMin)
