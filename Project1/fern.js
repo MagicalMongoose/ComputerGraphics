@@ -154,7 +154,7 @@ function generatePoints(presetValues)
 
         //general form of the series: 
         nextX = (a*x) + (b*y) + e;
-        nextY = (c*x) + (d*y) + f/3;
+        nextY = (c*x) + (d*y) + f;
 
         //get the x/yMax 
         if (nextX > xMax)
@@ -172,6 +172,7 @@ function generatePoints(presetValues)
         nextX = (nextX - xMin) / (xMax - xMin);
         nextY = (nextY - yMin) / (yMax - yMin);
         
+        //update x/y so the fern moves as intended
         x = nextX;
         y = nextY;
         
