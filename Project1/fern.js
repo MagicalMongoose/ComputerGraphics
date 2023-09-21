@@ -128,53 +128,6 @@ function determineSet(presetValues)
     return setNum;
 }
 
-function formula(x,y,setNum)
-{
-    console.log("formula starting with: ", x, y, setNum);
-    var nextX = 0;
-    var nextY = 0;
-    if (setNum == 0)
-    {
-        nextX = (0.0*x) + (0.0*y) + 0.0;
-        nextY = (0.0*x) + (0.16*y) + 0.0;
-    }
-    else if (setNum == 1)
-    {
-        nextX = (0.85*x) + (0.04*y) + 0.0;
-        nextY = (0.04*x) + (0.85*y) + 1.6;
-    }
-    else if (setNum == 2)
-    {
-        nextX = (0.2*x) + (0.26*y) + 0.0;
-        nextY = (0.23*x) + (0.22*y) + 1.6;
-    }
-    else if (setNum == 3)
-    {
-        nextX = (-0.15*x) + (0.28*y) + 0.0;
-        nextY = (0.26*x) + (0.24*y) + 0.44;
-    }
-    console.log("formula result: ", nextX, nextY);
-    return nextX, nextY;
-}
-
-//formula but more modular
-function calculatePoint(presetValues, x, y)
-{
-    var set = determineSet(presetValues);
-    var a = presetValues[0][set];
-    var b = presetValues[1][set];
-    var c = presetValues[2][set];
-    var d = presetValues[3][set];
-    var e = presetValues[4][set];
-    var f = presetValues[5][set];
-
-    //general form of the series: 
-    nextX = (a*x) + (b*y) + e;
-    nextY = (c*x) + (d*y) + f;
-
-    return nextX, nextY;
-}
-
 //generate a list of points that will be used to draw the fern
 function generatePoints(presetValues) 
 {
@@ -188,6 +141,7 @@ function generatePoints(presetValues)
 
     for (let i = 0; i < total; i++)
     {
+        //set coefficients based on random set
         var set = determineSet(presetValues);
         var a = presetValues[0][set];
         var b = presetValues[1][set];
@@ -200,29 +154,13 @@ function generatePoints(presetValues)
         let nextX = (a*x) + (b*y) + e;
         let nextY = (c*x) + (d*y) + f;
 
-        /*
-        let nextX, nextY;
-
-        if (r <= 0.01) {
-            nextX = 0;
-            nextY = 0.16 * y;
-        } else if (r <= 0.86) {
-            nextX = 0.85 * x + 0.04 * y;
-            nextY = -0.04 * x + 0.85 * y + 1.6;
-        } else if (r <= 0.93) {
-            nextX = 0.2 * x - 0.26 * y;
-            nextY = 0.23 * x + 0.22 * y + 1.6;
-        } else {
-            nextX = -0.15 * x + 0.28 * y;
-            nextY = 0.26 * x + 0.24 * y + 0.44;
-        }
-        */
-
+        //determine xMin, xMax
         if (nextX > xMax)
         {xMax = nextX;}
         if (nextX < xMin)
         {xMin = nextX;}
-
+        
+        //determine yMin, yMax
         if (nextY > yMax)
         {yMax = nextY;}
         if (nextY < yMin)
@@ -245,6 +183,7 @@ function generatePoints(presetValues)
 
     for (let i = 0; i < points.length; i++)
     {
+        //temporary names for readability
         var xPos = points[i][0];
         var yPos = points[i][1];
 
@@ -270,28 +209,6 @@ function generatePoints(presetValues)
 
     return points;
 }
-    
-/*
-//recursively draw fern
-function fern(presetValues, x, y, depth) 
-{
-    if (debug) 
-    {
-        console.log("fern depth: " + depth);
-        console.log("x: " + x + " y: " + y);
-    }
-    //check for end of recursion
-    if (depth === 0) 
-    {generatePoints(presetValues);}
-    else 
-    {
-        --depth;
-        
-        for (let i = 0; i < branches; i++)
-        {fern(presetValues, x, y, depth);}
-    }
-}
-*/
 
 function render() 
 {
