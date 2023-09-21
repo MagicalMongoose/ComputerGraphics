@@ -5,8 +5,8 @@ var points = [];
 //var depth = 6; // branches^depth = number of points in the fern
 var color = 1;      // choose color for display, press key 'c'
 var drawAlt = 1;  // choose patten for display, mouse click
-var debug = true;
-var total = 50;
+var debug = false;
+var total = 50000;
 var i = 0;
 
 
@@ -51,7 +51,7 @@ function main()
 
     //primary function
     //fern(presetValues, x, y, depth);
-    points = generatePoints(presetValues1);
+    points = generatePoints();//presetValues1);
     console.log("points: ", points);
 
     //  Configure WebGL
@@ -176,39 +176,18 @@ function calculatePoint(presetValues, x, y)
 }
 
 //generate a list of points that will be used to draw the fern
-function generatePoints(presetValues) 
+function generatePoints()//presetValues) 
 {
     points = []; //clear points array
     let x = 0;
     let y = 0;
-    var xMin, xMax = 0;
-    var yMin, yMax = 0;
-    let i = 0;
-    
+    var xMin = 0;
+    var xMax = 0;
+    var yMin = 0;
+    var yMax = 0;    
 
-    while (i < total)
+    for (let i = 0; i < total; i++)
     {
-        //let nextX, nextY;
-        /*
-        var set = determineSet(presetValues);
-        var a = presetValues[0][set];
-        var b = presetValues[1][set];
-        var c = presetValues[2][set];
-        var d = presetValues[3][set];
-        var e = presetValues[4][set];
-        var f = presetValues[5][set];
-
-        //general form of the series: 
-        nextX = (a*x) + (b*y) + e;
-        nextY = (c*x) + (d*y) + f;
-        */
-        /*
-        console.log("looping with: ", x, y);
-        nextX, nextY = formula(x, y, determineSet(presetValues));
-        //nextX, nextY = calculatePoint(presetValues, x, y);
-
-        console.log("nextX: " + nextX + " nextY: " + nextY);
-        */
         const r = Math.random();
 
         let nextX, nextY;
@@ -226,31 +205,17 @@ function generatePoints(presetValues)
             nextX = -0.15 * x + 0.28 * y;
             nextY = 0.26 * x + 0.24 * y + 0.44;
         }
-        //console.log("newX, newY: ", nextX, nextY);
-        //x = nextX;
-        //y = nextY;
-        //console.log("loop after formula: x, y: ", x, y);
-
-        //get the x/yMax and //get the x/yMin
         
         if (nextX > xMax)
         {xMax = nextX;}
-        if (nextX < xMin && nextX != xMax)
+        if (nextX < xMin)
         {xMin = nextX;}
 
         if (nextY > yMax)
         {yMax = nextY;}
-        if (nextY < yMin && nextY != yMax)
+        if (nextY < yMin)
         {yMin = nextY;}
-        
-        //normalization
-        if (xMax != xMin)
-        {nextX = (nextX - xMin) / (xMax - xMin);}
-        if (yMax != yMin)
-        {nextY = (nextY - yMin) / (yMax - yMin);}
 
-        console.log("normalized nextX: " + nextX +  nextX + " normalized nextY: " + nextY);
-        
         //update x/y so the fern moves as intended
         x = nextX;
         y = nextY;
@@ -259,21 +224,38 @@ function generatePoints(presetValues)
 
         if (debug) 
         {
-            /*
-            console.log("a: ", a);
-            console.log("b: ", b);
-            console.log("c: ", c);
-            console.log("d: ", d);
-            console.log("e: ", e);
-            console.log("f: ", f);
-            */
             console.log("x y: ", x, y);
-            //console.log("xMax yMax: ", xMax, yMax);
-            //console.log("xMin yMin: ", xMin, yMin);
+            console.log("xMin xMax: ", xMin, xMax);
+            console.log("yMin yMax: ", yMin, yMax);
+            console.log("nextX nextY: ", nextX, nextY);
         }
-        
-        i++
     }
+
+    for (let i = 0; i < points.length; i++)
+    {
+        var xPos = points[i][0];
+        var yPos = points[i][1];
+
+        //normalization
+        if (xMax != xMin)
+        {xPos = (xPos - xMin) / (xMax - xMin);}
+        if (yMax != yMin)
+        {yPos = (yPos - yMin) / (yMax - yMin);}
+
+        //scale to be larger
+        xPos = (xPos - 0.5) * 2;
+        yPos = (yPos - 0.5) * 2;
+
+        //replace points with normalized and scaled values
+        points[i] = vec2(xPos, yPos);
+
+        if (debug) 
+        {
+            console.log("x y: ", xPos, yPos);
+        }
+    
+    }
+
     return points;
 }
     
