@@ -1,12 +1,13 @@
 var canvas, gl;
 var program;
 var points = [];
+var points2 = [];
 //var branches = 4;
 //var depth = 6; // branches^depth = number of points in the fern
 var color = 1;      // choose color for display, press key 'c'
 var drawAlt = 1;  // choose patten for display, mouse click
 var debug = false;
-var total = 50000;
+var total = 20000;
 var i = 0;
 
 
@@ -28,8 +29,6 @@ function main()
         /*f*/[0.0,  1.6,   0.44,  1.6],
         /*p*/[0.1,  0.08,  0.08,  0.74] //p[] sum == 1
     ]
-        //probability ranges
-        //(0-0.1) (0.1-0.18) (0.18-0.26) (0.26-1)
     
         var presetValues2 = 
         [       //s0    s1    s2     s3
@@ -41,18 +40,11 @@ function main()
             /*f*/[0.0,  1.6,   0.44,  1.6],
             /*p*/[0.01,  0.07,  0.07,  0.85] //p[] sum == 1
         ]
-        //probability ranges
-        //(0-0.1) (0.1-0.18) (0.18-0.26) (0.26-1)
-
-        //set 0: stem
-        //set 1: largest left-hand leaflets
-        //set 2: largest right-hand leaflets
-        //set 3: successively smaller leaflets
 
     //primary function
-    //fern(presetValues, x, y, depth);
     points = generatePoints(presetValues1);
-    console.log("points: ", points);
+    //points2 = generatePoints(presetValues2);
+    if (debug) {console.log("points: ", points);}
 
     //  Configure WebGL
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -71,20 +63,21 @@ function main()
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
-    /*
+    
     //update this to generate both on first load, and save both in buffer, rather than regenerating same data each time
     canvas.addEventListener("mousedown", function()
     {
         drawAlt = !drawAlt; //toggle which fern to render
         
-        if (drawAlt == 1)
-            {generatePoints(presetValues1);}
+        if (drawAlt)
+        {generatePoints(presetValues1);}
         else 
-            {generatePoints(presetValues2);}
+        {generatePoints(presetValues2);}
+
         render();
         console.log("mouse down detected, now using pattern: ", drawAlt);
     });
-    */
+    
     // always return upper case letter
     window.addEventListener("keydown", function ()
     {
@@ -213,10 +206,18 @@ function generatePoints(presetValues)
 function render() 
 {
     if (debug) 
-    {//console.log(points);}
-    }
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    {console.log(points);}
 
-    gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
-    gl.drawArrays(gl.POINTS, 0, points.length);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    
+    if (drawAlt)
+    {
+        gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
+        gl.drawArrays(gl.POINTS, 0, points.length);
+    }
+    else 
+    {
+        gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
+        gl.drawArrays(gl.POINTS, 0, points.length);
+    }
 }
