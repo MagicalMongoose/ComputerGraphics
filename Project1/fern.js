@@ -43,7 +43,7 @@ function main()
 
     //primary function
     points = generatePoints(presetValues1);
-    //points2 = generatePoints(presetValues2);
+
     if (debug) {console.log("points: ", points);}
 
     //  Configure WebGL
@@ -68,11 +68,18 @@ function main()
     canvas.addEventListener("mousedown", function()
     {
         drawAlt = !drawAlt; //toggle which fern to render
-        
+        points = []; //clear points array
+
         if (drawAlt)
-        {generatePoints(presetValues1);}
+        {
+            generatePoints(presetValues1);
+            console.log("generated presetValues1");
+        }
         else 
-        {generatePoints(presetValues2);}
+        {
+            generatePoints(presetValues2);
+            console.log("generated presetValues2");
+        }
 
         render();
         console.log("mouse down detected, now using pattern: ", drawAlt);
@@ -205,9 +212,9 @@ function generatePoints(presetValues)
 
 function render() 
 {
-    if (debug) 
-    {console.log(points);}
-
+    //if (debug) 
+    {console.log("rendering ", points.length, " points");}
+    console.log(points);
     gl.clear(gl.COLOR_BUFFER_BIT);
     
     if (drawAlt)
