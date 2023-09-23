@@ -1,15 +1,10 @@
 var canvas, gl;
 var program;
 var points = [];
-var points2 = [];
-//var branches = 4;
-//var depth = 6; // branches^depth = number of points in the fern
 var color = 1;      // choose color for display, press key 'c'
 var drawAlt = 1;  // choose patten for display, mouse click
 var debug = false;
 var total = 20000;
-var i = 0;
-
 
 function main()
 {
@@ -30,22 +25,72 @@ function main()
         /*p*/[0.1,  0.08,  0.08,  0.74] //p[] sum == 1
     ]
     
-        var presetValues2 = 
-        [       //s0    s1    s2     s3
-            /*a*/[0.0,  0.2,   -0.15, 0.85],
-            /*b*/[0.0,  -0.26, 0.28,  0.04],
-            /*c*/[0.0,  0.23,  0.26,  -0.04],
-            /*d*/[0.16, 0.22,  0.24,  0.85],
-            /*e*/[0.0,  0.0,   0.0,   0.0],
-            /*f*/[0.0,  1.6,   0.44,  1.6],
-            /*p*/[0.01,  0.07,  0.07,  0.85] //p[] sum == 1
-        ]
+    var presetValues2 = 
+    [       //s0    s1    s2     s3
+        /*a*/[0.0,  0.2,   -0.15, 0.85],
+        /*b*/[0.0,  -0.26, 0.28,  0.04],
+        /*c*/[0.0,  0.23,  0.26,  -0.04],
+        /*d*/[0.16, 0.22,  0.24,  0.85],
+        /*e*/[0.0,  0.0,   0.0,   0.0],
+        /*f*/[0.0,  1.6,   0.44,  1.6],
+        /*p*/[0.01,  0.07,  0.07,  0.85] //p[] sum == 1
+    ]
 
     //primary function
-    points = generatePoints(presetValues1);
+    generatePoints(presetValues1);
 
     if (debug) {console.log("points: ", points);}
 
+    //THIS IS IMPORTANT! Need to send all the new points to the GPU so it renders a new fern
+    sendToGPU();
+    
+    //update this to generate both on first load, and save both in buffer, rather than regenerating same data each time
+    canvas.addEventListener("mousedown", function()
+    {
+        drawAlt = !drawAlt; //toggle which fern to render
+        points = []; //clear points array
+
+        if (drawAlt)
+        {
+            generatePoints(presetValues1);
+            if(debug)
+            {console.log("generated presetValues1");}
+        }
+        else 
+        {
+            generatePoints(presetValues2);
+            if(debug)
+            {console.log("generated presetValues2");}
+        }
+        sendToGPU();
+        render();
+        if(debug)
+        {console.log("mouse down detected, now using pattern: ", drawAlt);}
+    });
+    
+    // always return upper case letter
+    window.addEventListener("keydown", function ()
+    {
+    if (event.keyCode == 67) //C
+    {
+        if (color==1)
+            {color = 0;}
+        else
+            {color = 1;}
+
+        if(debug)
+        {console.log("switching to color ", color);}
+        
+        render();
+    }
+    });
+    
+
+    render();
+};
+
+function sendToGPU()
+{
     //  Configure WebGL
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
 
@@ -62,46 +107,7 @@ function main()
     var vPosition = gl.getAttribLocation( program, "vPosition" );
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
-
-    
-    //update this to generate both on first load, and save both in buffer, rather than regenerating same data each time
-    canvas.addEventListener("mousedown", function()
-    {
-        drawAlt = !drawAlt; //toggle which fern to render
-        points = []; //clear points array
-
-        if (drawAlt)
-        {
-            generatePoints(presetValues1);
-            console.log("generated presetValues1");
-        }
-        else 
-        {
-            generatePoints(presetValues2);
-            console.log("generated presetValues2");
-        }
-
-        render();
-        console.log("mouse down detected, now using pattern: ", drawAlt);
-    });
-    
-    // always return upper case letter
-    window.addEventListener("keydown", function ()
-    {
-    if (event.keyCode == 67) //C
-    {
-        if (color==1)
-            {color = 0;}
-        else
-            {color = 1;}
-        console.log("switching to color ", color);
-        render();
-    }
-    });
-    
-
-    render();
-};
+}
 
 //create a random number, then determine which set to use
 function determineSet(presetValues)
@@ -206,25 +212,14 @@ function generatePoints(presetValues)
         }
     
     }
-
-    return points;
 }
 
 function render() 
 {
-    //if (debug) 
-    {console.log("rendering ", points.length, " points");}
-    console.log(points);
+    if (debug) 
+    {console.log(points);}
     gl.clear(gl.COLOR_BUFFER_BIT);
-    
-    if (drawAlt)
-    {
-        gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
-        gl.drawArrays(gl.POINTS, 0, points.length);
-    }
-    else 
-    {
-        gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
-        gl.drawArrays(gl.POINTS, 0, points.length);
-    }
+
+    gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
+    gl.drawArrays(gl.POINTS, 0, points.length);
 }
