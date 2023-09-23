@@ -4,7 +4,7 @@ var points = [];
 var color = 1;      // choose color for display, press key 'c'
 var drawAlt = 1;  // choose patten for display, mouse click
 var debug = false;
-var total = 20000;
+var total = 100000;
 
 function main()
 {
