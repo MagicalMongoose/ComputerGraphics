@@ -11,7 +11,8 @@ function main()
     canvas = document.getElementById( "gl-canvas" );
     
     gl = WebGLUtils.setupWebGL( canvas );
-    if ( !gl ) { console.log( "WebGL isn't available" ); return; }
+    if ( !gl ) 
+    {console.log( "WebGL isn't available" ); return;}
 
     //sets
     var presetValues1 = 
@@ -39,11 +40,9 @@ function main()
     //primary function
     generatePoints(presetValues1);
 
-    if (debug) {console.log("points: ", points);}
+    if (debug) 
+    {console.log("points: ", points);}
 
-    //THIS IS IMPORTANT! Need to send all the new points to the GPU so it renders a new fern
-    sendToGPU();
-    
     //update this to generate both on first load, and save both in buffer, rather than regenerating same data each time
     canvas.addEventListener("mousedown", function()
     {
@@ -62,8 +61,10 @@ function main()
             if(debug)
             {console.log("generated presetValues2");}
         }
+
         sendToGPU();
         render();
+
         if(debug)
         {console.log("mouse down detected, now using pattern: ", drawAlt);}
     });
@@ -80,12 +81,13 @@ function main()
 
         if(debug)
         {console.log("switching to color ", color);}
-        
+
         render();
     }
     });
-    
 
+    //THIS IS IMPORTANT! Need to send all the new points to the GPU so it renders a new fern
+    sendToGPU();
     render();
 };
 
@@ -115,7 +117,9 @@ function determineSet(presetValues)
     var setNum;
 
     var rand = Math.random();
-    if (debug) {console.log("rand: " + rand);}
+
+    if (debug) 
+    {console.log("rand: " + rand);}
     
     //structured like this to return as early as possible
     if (rand < (presetValues[6][0]))
@@ -130,7 +134,9 @@ function determineSet(presetValues)
     else
     {setNum = 3;}
 
-    if (debug) {console.log("setNum: " + setNum);}
+    if (debug) 
+    {console.log("setNum: " + setNum);}
+
     return setNum;
 }
 
@@ -207,9 +213,7 @@ function generatePoints(presetValues)
         points[i] = vec2(xPos, yPos);
 
         if (debug) 
-        {
-            console.log("x y: ", xPos, yPos);
-        }
+        {console.log("x y: ", xPos, yPos);}
     
     }
 }
