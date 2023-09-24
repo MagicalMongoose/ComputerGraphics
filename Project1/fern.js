@@ -1,3 +1,9 @@
+/*
+Drew Lickman
+Professor Li
+Barnsley Fern project 1
+*/
+
 var canvas, gl;
 var program;
 var points = [];
