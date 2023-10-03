@@ -97,7 +97,6 @@ function getScaleFactor()
 function drawBranch()
 {
     var s; //scale
-
     //one branch
     modelViewStack.push(modelViewMatrix); //save the MVM
 
@@ -107,13 +106,6 @@ function drawBranch()
     gl.drawArrays(gl.LINE_STRIP, 0, points.length);
 
     modelViewMatrix = modelViewStack.pop(); //undo scaling effect
-
-    modelViewStack.push(modelViewMatrix); //save the MVM
-    s = scale4(scaleFactor, -scaleFactor, 1);
-    modelViewMatrix = mult(modelViewMatrix, s);
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix)); //send MVM to vertex shader
-    gl.drawArrays(gl.LINE_STRIP, 0, points.length); 
-    modelViewMatrix = modelViewStack.pop(); //undo scaling effect
 }
 
 function drawStar()
@@ -121,13 +113,13 @@ function drawStar()
     var r; //rotation
 
     //draw a star
-    for (var i = 0; i < 5; i++)
+    for (var i = 0; i < 6; i++)
     {
         drawBranch();
 
         modelViewStack.push(modelViewMatrix); //save the MVM
 
-        r = rotate(60*i, 0, 0, 1);
+        r = rotate(72*i, 0, 0, 1);
         modelViewMatrix = mult(modelViewMatrix, r);
         drawBranch();
 
@@ -157,20 +149,19 @@ function render()
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     var r, s, t;
-    var radius = 0;
-    var rotationStep = Math.PI/12;
+    var radius = 0.35;
+    var rotationStep = Math.PI/6;
 
     modelViewMatrix = mat4(); //default identity matrix
-    scaleFactor = getScaleFactor();
+    scaleFactor = 1/30;
     console.log(scaleFactor);
-    drawStar();
 
     for (var i = 0; i < 12; i++)
     {
         t = translate(radius * Math.cos(rotationStep * i), radius * Math.sin(rotationStep * i), 0);
         modelViewMatrix = t;
         
-        r = rotate(50*i, 0, 0, 1);
+        r = rotate(25*i, 0, 0, 1);
         modelViewMatrix = mult(t,r);
 
         drawStar();
