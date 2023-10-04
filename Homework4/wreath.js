@@ -64,36 +64,6 @@ function scale4(x, y, z)
     return result;
 } 
 
-function getScaleFactor()
-{
-    var xMin = -1;
-    var xMax = 1;
-    var yMin = -1;
-    var yMax = 1;
-
-    for (var i = 0; i < points.length; i++)
-    {
-        //determine xMin, xMax
-        if (points[i][0] > xMax)
-        {xMax = points[i][0];}
-        if (points[i][0] < xMin)
-        {xMin = points[i][0];}
-        
-        //determine yMin, yMax
-        if (points[i][1] > yMax)
-        {yMax = points[i][1];}
-        if (points[i][1] < yMin)
-        {yMin = points[i][1];}
-    }
-
-    const absoluteValues = [Math.abs(xMin), Math.abs(xMax), Math.abs(yMin), Math.abs(yMax)];
-    const maxAbsoluteValue = Math.max(...absoluteValues);
-    console.log(maxAbsoluteValue);
-    return 1/maxAbsoluteValue;
-
-
-}
-
 function drawBranch()
 {
     var s; //scale
@@ -155,7 +125,6 @@ function render()
 
     modelViewMatrix = mat4(); //default identity matrix
     scaleFactor = 1/30;
-    console.log(scaleFactor);
 
     for (var i = 0; i < numStars; i++)
     {
