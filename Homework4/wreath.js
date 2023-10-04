@@ -111,15 +111,15 @@ function drawBranch()
 function drawStar()
 {
     var r; //rotation
-
+    var starPoints = 5; 
     //draw a star
-    for (var i = 0; i < 6; i++)
+    for (var i = 0; i < starPoints; i++)
     {
         drawBranch();
 
         modelViewStack.push(modelViewMatrix); //save the MVM
 
-        r = rotate(72*i, 0, 0, 1);
+        r = rotate((360/starPoints)*i, 0, 0, 1);
         modelViewMatrix = mult(modelViewMatrix, r);
         drawBranch();
 
@@ -150,13 +150,14 @@ function render()
 
     var r, s, t;
     var radius = 0.35;
-    var rotationStep = Math.PI/6;
+    var numStars = 12;
+    var rotationStep = Math.PI/(numStars/2);
 
     modelViewMatrix = mat4(); //default identity matrix
     scaleFactor = 1/30;
     console.log(scaleFactor);
 
-    for (var i = 0; i < 12; i++)
+    for (var i = 0; i < numStars; i++)
     {
         t = translate(radius * Math.cos(rotationStep * i), radius * Math.sin(rotationStep * i), 0);
         modelViewMatrix = t;
