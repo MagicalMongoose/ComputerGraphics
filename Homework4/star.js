@@ -8,8 +8,7 @@ var canvas, gl;
 var program;
 var modelViewStack = [];
 var modelViewMatrix;
-var scaleFactor
-var color = 0;
+var scaleFactor;
 var points = [];
 var debug = false;
 
@@ -66,6 +65,7 @@ function scale4(x, y, z)
 
 function drawBranch()
 {
+    scaleFactor = 1/20;
     var s; //scale
     //one branch
     modelViewStack.push(modelViewMatrix); //save the MVM
@@ -114,29 +114,69 @@ function generatePoints()
     return points;
 }
 
+var TOTAL_STEPS = 100;
+var stepCount = 0;
+
+// This is the starting and ending location of the animation
+var startX = -0.75, startY = -0.75; // upper left corner
+var target1X = 0, target1Y = 0.75;  // top middle
+var target2X = 0.75, target2Y = -0.75; // bottomright corner
+
+var locationX = startX;
+var locationY = startY;
+
+//direction 1 means going up, 2 means going down
+var direction = 1;
+
+function newLocation(current, target, start)
+{
+    //returns the calculated formula for adding a translation delta
+    return (current + (target-start)/TOTAL_STEPS);
+}
+
 function render() 
 {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    var r, s, t;
-    var radius = 0.35;
-    var numStars = 12;
-    var rotationStep = Math.PI/(numStars/2);
+    //variable to hold translation matrix
+    var t;
 
-    modelViewMatrix = mat4(); //default identity matrix
-    scaleFactor = 1/30;
-
-    for (var i = 0; i < numStars; i++)
+    if (direction == 1)
     {
-        t = translate(radius * Math.cos(rotationStep * i), radius * Math.sin(rotationStep * i), 0);
-        modelViewMatrix = t;
-        
-        r = rotate(25*i, 0, 0, 1);
-        modelViewMatrix = mult(t,r);
+         //update to new position
+        locationX = newLocation(locationX, target1X, startX);
+        locationY = newLocation(locationY, target1Y, startY);
 
-        drawStar();
+        stepCount++;
+        if (stepCount >= TOTAL_STEPS)
+        {
+            stepCount = 0;
+            direction = 2;
+        }
     }
-    
-    gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), color);
-    gl.drawArrays(gl.LINE_STRIP, 0, points.length);
+    else if (direction == 2)
+    {
+         //update to new position
+        locationX =  + newLocation(locationX, target2X, target1X);
+        locationY =  + newLocation(locationY, target2Y, target1Y);
+
+        stepCount++;
+        if (stepCount >= TOTAL_STEPS)
+        {
+            direction = -1;
+        }
+    }
+    else
+    {
+        //stop at the 2nd target
+        locationX = target2X;
+        locationY = target2Y;
+    }
+
+    //apply the translation to the star, then render it
+    t = translate(locationX, locationY, 0);
+    modelViewMatrix = t;
+    drawStar();
+
+    requestAnimationFrame(render);
 }
