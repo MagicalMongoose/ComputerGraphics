@@ -64,51 +64,121 @@ function scale4(a, b, c) {
     return result;
 }
 
+var backCircleCount = 180;
+var circlePointCount = 360;
+var frontCircleCount = 180;
+var colorPresets = [vec4(1,0.5,0.5,1), vec4(1,0,0,1), vec4(1,1,0,1), vec4(0,1,0,1)];
+var ringCount = 4;
+var ringDistanceOffset = 2;
+
+function GenerateRing(x,y, radius, color, back)
+{
+    for (var i = 0; i < backCircleCount; i++)
+    {
+        x = radius * Math.cos(i)/1.618;
+        if (back)
+            y = Math.abs(radius * Math.sin(i)/3.236); //back half of rings
+        else
+            y = -Math.abs(radius * Math.sin(i)/3.236); //front half of rings
+        points.push(vec2(x, y));
+        colors.push(color);
+    }
+}
+
 function GenerateBackCircles()
 {
+    modelViewMatrix = mat4(); //default identity matrix
+    var x,y;
+    var t; //translation matrix
+    var r; //rotation matrix
+    
+    
+    for (var i = 0; i < ringCount; i++)
+    {
+        GenerateRing(x,y,i+ringDistanceOffset, colorPresets[i], true);
+    }
 
-
-
+    gl.drawArrays(gl.LINE_STRIP, 0, backCircleCount*ringCount);
 }
 
 function GenerateCircle()
 {
-
+    modelViewMatrix = mat4(); //default identity matrix
     var radius = 1;
     var x,y;
-    var circlePointCount = 360;
     for (var i = 0; i < circlePointCount; i++)
     {
         x = radius * Math.cos(i)/1.618; //divide by golden ratio to set it back to a circle
         y = radius * Math.sin(i);
         points.push(vec2(x, y));
-        colors.push(vec4(1,1,0,1));
+        colors.push(vec4(1,1,0,1)); //yellow
     }
 
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, circlePointCount);
+    gl.drawArrays(gl.TRIANGLE_FAN, backCircleCount*4, circlePointCount);
 }
 
 function GenerateFrontCircles()
 {
+    modelViewMatrix = mat4(); //default identity matrix
+    var x,y;
+    var t; //translation matrix
+    var r; //rotation matrix
+    
+    
+    for (var i = 0; i < ringCount; i++)
+    {
+        GenerateRing(x,y,i+ringDistanceOffset, colorPresets[i], false);
+    }
 
-
-
+    gl.drawArrays(gl.LINE_STRIP, backCircleCount*4+circlePointCount, frontCircleCount*ringCount);
 }
 
 
 function DrawFullPlanet()
-{
-
+{   
+    var t; //translation
+    var r; //rotation
+    var s; //scale
+    var ringRotationAngle = 70;
+    modelViewMatrix = mat4(); //default identity matrix
+    modelViewStack.push(modelViewMatrix);
+    
+    t = mult(modelViewMatrix, translate(-2, 0, 0));
+    modelViewMatrix = mult(t, modelViewMatrix);
+    
+    r = mult(modelViewMatrix, rotate(ringRotationAngle, 0, 0, 1));
+    modelViewStack.push(modelViewMatrix);
     // Draw Back Circles
     
+    //rotate the rings
+    modelViewMatrix = mult(t, r);
+    
+    modelViewStack.push(modelViewMatrix);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    
+    GenerateBackCircles();
 
+    modelViewMatrix = modelViewStack.pop();
+
+    modelViewMatrix = mat4();
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
     // draw planet circle
+    modelViewMatrix = mult(t, modelViewMatrix);
+    modelViewMatrix = mult(t, modelViewMatrix);
+    
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+
+    GenerateCircle();
+
     
 
-
+    //rotate the rings
+    modelViewMatrix = mult(r, modelViewMatrix);
+    modelViewMatrix = mult(t, r);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     // Draw Front Circles
-    
+    GenerateFrontCircles();
 }
 
 
@@ -118,6 +188,6 @@ function render()
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
-    GenerateCircle();
+    
     DrawFullPlanet();
 }
