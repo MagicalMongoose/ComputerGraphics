@@ -140,47 +140,38 @@ function DrawFullPlanet()
     var r; //rotation
     var s; //scale
     var ringRotationAngle = 70;
-    modelViewMatrix = mat4(); //default identity matrix
-    modelViewStack.push(modelViewMatrix);
     
-    t = mult(modelViewMatrix, translate(-2, 0, 0));
+    t = mult(modelViewMatrix, translate(-2, 2, 0));
     modelViewMatrix = mult(t, modelViewMatrix);
     
     r = mult(modelViewMatrix, rotate(ringRotationAngle, 0, 0, 1));
-    modelViewStack.push(modelViewMatrix);
-    // Draw Back Circles
-    
-    //rotate the rings
     modelViewMatrix = mult(t, r);
     
-    modelViewStack.push(modelViewMatrix);
+    //apply modelViewMatrix
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-    
+
+    // Draw Back Circles
     GenerateBackCircles();
 
-    modelViewMatrix = modelViewStack.pop();
-
-    modelViewMatrix = mat4();
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-
-    // draw planet circle
+    //transform planet
     modelViewMatrix = mult(t, modelViewMatrix);
     modelViewMatrix = mult(t, modelViewMatrix);
     
+    //apply modelViewMatrix
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-
+    
+    // draw planet
     GenerateCircle();
 
-    
-
     //rotate the rings
-    modelViewMatrix = mult(r, modelViewMatrix);
     modelViewMatrix = mult(t, r);
+
+    //apply modelViewMatrix
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    
     // Draw Front Circles
     GenerateFrontCircles();
 }
-
 
 function render()
 {
