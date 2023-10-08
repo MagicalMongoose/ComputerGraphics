@@ -6,7 +6,7 @@ attribute  vec4 vPosition;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 
-attribute  vec4 vColor;
+attribute vec4 vColor;
 varying vec4 fColor;
 void main() {
    gl_Position =  projectionMatrix * modelViewMatrix * vPosition;
@@ -28,7 +28,7 @@ void main() {
 <script type="text/javascript" src="planet.js"></script>
 
 <body>
-<canvas id="gl-canvas" width="830"" height="512">
+<canvas id="gl-canvas" width="830" height="512">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 

@@ -1,4 +1,4 @@
-var modelViewMatrix);
+var modelViewMatrix;
 var modelViewMatrixLoc;
 var projectionMatrix;
 var projectionMatrixLoc;
@@ -57,11 +57,11 @@ window.onload = function init()
 }
 
 function scale4(a, b, c) {
-   	var result = mat4();
-   	result[0][0] = a;
-   	result[1][1] = b;
-   	result[2][2] = c;
-   	return result;
+    var result = mat4();
+    result[0][0] = a;
+    result[1][1] = b;
+    result[2][2] = c;
+    return result;
 }
 
 function GenerateBackCircles()
@@ -74,9 +74,18 @@ function GenerateBackCircles()
 function GenerateCircle()
 {
 
+    var radius = 1;
+    var x,y;
+    var circlePointCount = 360;
+    for (var i = 0; i < circlePointCount; i++)
+    {
+        x = radius * Math.cos(i)/1.618; //divide by golden ratio to set it back to a circle
+        y = radius * Math.sin(i);
+        points.push(vec2(x, y));
+        colors.push(vec4(1,1,0,1));
+    }
 
-
-
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, circlePointCount);
 }
 
 function GenerateFrontCircles()
@@ -91,14 +100,15 @@ function DrawFullPlanet()
 {
 
     // Draw Back Circles
-
+    
 
 
     // draw planet circle
+    
 
- 
+
     // Draw Front Circles
-
+    
 }
 
 
@@ -108,5 +118,6 @@ function render()
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
+    GenerateCircle();
     DrawFullPlanet();
 }
