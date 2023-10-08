@@ -70,11 +70,11 @@ function initBuffers() {
 
 // Form the 4x4 scale transformation matrix
 function scale4(a, b, c) {
-   var result = mat4();
-   result[0][0] = a;
-   result[1][1] = b;
-   result[2][2] = c;
-   return result;
+    var result = mat4();
+    result[0][0] = a;
+    result[1][1] = b;
+    result[2][2] = c;
+    return result;
 }
 
 function render() {
@@ -86,23 +86,37 @@ function render() {
     var  radius= 0.8;
     var  s, t, r;
 
-    if (version == 1) {
-	modelViewMatrix = mat4();
-    	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-    	gl.drawArrays( gl.TRIANGLE_FAN, 0, 4);
+    if (version == 1) 
+    {
+        modelViewMatrix = mat4();
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+        gl.drawArrays( gl.TRIANGLE_FAN, 0, 4);
 
     }
-    else if (version == 2) {
+    else if (version == 2) 
+    {
+        modelViewMatrix = mat4();
 
+        var smallScale = .15;
+        var squareCount = 16;
 
-
-
-
-
-
+        s = scale4(smallScale, smallScale, 1);
+        for (var i = 0; i < squareCount; i++) 
+        {
+            modelViewStack.push(modelViewMatrix);
+            //place squareCount squares in a circle
+            t = translate(radius*Math.sin(i*angle), radius*Math.cos(i*angle), 0);
+            
+            modelViewMatrix = mult(modelViewMatrix, t);
+            modelViewMatrix = mult(modelViewMatrix, s);
+            gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+            gl.drawArrays( gl.TRIANGLE_FAN, 0, 4);
+            modelViewMatrix = modelViewStack.pop();
+        }
 
     }
-    else if (version == 3) {
+    else if (version == 3) 
+    {
 
 
 
