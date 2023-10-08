@@ -67,7 +67,7 @@ function scale4(a, b, c) {
 var backCircleCount = 180;
 var circlePointCount = 360;
 var frontCircleCount = 180;
-var colorPresets = [vec4(1,0.5,0.5,1), vec4(1,0,0,1), vec4(1,1,0,1), vec4(0,1,0,1)];
+var colorPresets = [vec4(1,0.5,0.5,1), vec4(1,0,0,1), vec4(1,1,.25,1), vec4(0,1,0,1)];
 var ringCount = 4;
 var ringDistanceOffset = 2;
 
@@ -146,7 +146,10 @@ function DrawFullPlanet()
     
     r = mult(modelViewMatrix, rotate(ringRotationAngle, 0, 0, 1));
     modelViewMatrix = mult(t, r);
-    
+
+    s = mult(modelViewMatrix, scale4(.5, .25, .5));
+    modelViewMatrix = mult(t, s);
+
     //apply modelViewMatrix
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
@@ -157,6 +160,9 @@ function DrawFullPlanet()
     modelViewMatrix = mult(t, modelViewMatrix);
     modelViewMatrix = mult(t, modelViewMatrix);
     
+    s = mult(modelViewMatrix, scale4(.75, .75, .75));
+    modelViewMatrix = mult(t, s);
+    
     //apply modelViewMatrix
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     
@@ -166,11 +172,15 @@ function DrawFullPlanet()
     //rotate the rings
     modelViewMatrix = mult(t, r);
 
+    s = mult(modelViewMatrix, scale4(.5, .25, .5));
+    modelViewMatrix = mult(t, s);
+
     //apply modelViewMatrix
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     
     // Draw Front Circles
     GenerateFrontCircles();
+    
 }
 
 function render()
