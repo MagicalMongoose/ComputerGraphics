@@ -98,13 +98,13 @@ function GenerateBackCircles()
         GenerateRing(x,y,i+ringDistanceOffset, colorPresets[i], true);
     }
 
-    gl.drawArrays(gl.LINE_STRIP, 0, backCircleCount*ringCount);
+    gl.drawArrays(gl.POINTS, 0, backCircleCount*ringCount);
 }
 
 function GenerateCircle()
 {
     modelViewMatrix = mat4(); //default identity matrix
-    var radius = 1;
+    var radius = 0.75;
     var x,y;
     for (var i = 0; i < circlePointCount; i++)
     {
@@ -130,7 +130,7 @@ function GenerateFrontCircles()
         GenerateRing(x,y,i+ringDistanceOffset, colorPresets[i], false);
     }
 
-    gl.drawArrays(gl.LINE_STRIP, backCircleCount*4+circlePointCount, frontCircleCount*ringCount);
+    gl.drawArrays(gl.POINTS, backCircleCount*4+circlePointCount, frontCircleCount*ringCount);
 }
 
 
