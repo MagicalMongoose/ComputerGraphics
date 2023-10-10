@@ -108,10 +108,10 @@ function GenerateCircle()
     var x,y;
     for (var i = 0; i < circlePointCount; i++)
     {
-        x = radius * Math.cos(i)/1.618; //divide by golden ratio to set it back to a circle
+        x = radius * Math.cos(i)/Ratio; //divide by golden ratio to set it back to a circle
         y = radius * Math.sin(i);
         points.push(vec2(x, y));
-        colors.push(vec4(1,1,0,1)); //yellow
+        colors.push(vec4(.8,.8,0,1)); //yellow
     }
 
     gl.drawArrays(gl.TRIANGLE_FAN, backCircleCount*4, circlePointCount);
