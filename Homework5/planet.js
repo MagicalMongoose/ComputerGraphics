@@ -81,6 +81,7 @@ function GenerateRing(x,y, radius, color, back)
         else
             y = -Math.abs(radius * Math.sin(i)/3.236); //front half of rings
         points.push(vec2(x, y));
+
         colors.push(color);
     }
 }

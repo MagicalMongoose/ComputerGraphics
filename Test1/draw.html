@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html>
-<head>
     <meta charset="utf-8" />
-    <title>Draw a circle</title>
-</head>
+    <title>Test 1</title>
+<head>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
-attribute vec4 vPosition;
+attribute  vec4 vPosition;
+uniform mat4 modelViewMatrix;
 void main() {
-    gl_Position = vPosition;
+    gl_Position =  modelViewMatrix * vPosition;
+    gl_PointSize = 2.0;
 }
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
 precision mediump float;
-//uniform int colorIndex;
+uniform int colorIndex;
 void main() {
-   // if colorIndex ...
-    gl_FragColor = vec4( 0.0, 0.0, 1.0, 1.0 );
+    gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
 }
 </script>
 
 <script type="text/javascript" src="../Common/webgl-utils.js"></script>
 <script type="text/javascript" src="../Common/initShaders.js"></script>
 <script type="text/javascript" src="../Common/MV.js"></script>
-<script type="text/javascript" src="circle.js"></script>
+<script type="text/javascript" src="draw.js"></script>
 </head>
 
 <body onload="main()">

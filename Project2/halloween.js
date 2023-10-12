@@ -132,7 +132,7 @@ function render()
         // then, draw ghost
         modelViewMatrix = mat4();
         modelViewMatrix = mult(modelViewMatrix, translate(-3, -2, 0));
-        modelViewMatrix=mult(modelViewMatrix, scale4(2, 2, 1));
+        modelViewMatrix = mult(modelViewMatrix, scale4(2, 2, 1));
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
         DrawGhost();
 
