@@ -58,7 +58,7 @@ function scale4(a, b, c) {
 
 function generateCircle()
 {
-    var radius = 0.35;
+    var radius = 0.6;
     var pointCount = 100;
     var angle = 2*Math.PI/pointCount;
 
@@ -77,10 +77,12 @@ function generateCircle()
 function render() 
 {
     gl.clear(gl.COLOR_BUFFER_BIT);
-
+    var scale = .65;
     //draw circle
     modelViewMatrix = mat4();
     modelViewStack.push(modelViewMatrix);
+    s = scale4(scale, scale, 1);
+    modelViewMatrix = mult(modelViewMatrix, s);
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.drawArrays(gl.LINE_STRIP, 5, vertices.length-5);
     modelViewMatrix = modelViewStack.pop();
@@ -88,9 +90,9 @@ function render()
     //draw petals
     var petalCount = 8;
     var angle = 2*Math.PI/petalCount;
-    var radius = 0.5;
+    var radius = 0.55;
     var t, r, s;
-    var scale = .75;
+    
 
     modelViewMatrix = mat4();
     
