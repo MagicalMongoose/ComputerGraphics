@@ -10,9 +10,11 @@ uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 
 
-void main() {
+void main() 
+{
    gl_Position =  projectionMatrix * modelViewMatrix * vPosition;
    fColor = vColor;
+   gl_PointSize = 1.0;
 }
 </script>
 
@@ -32,7 +34,6 @@ void main() {
 
 <script type="text/javascript" src="halloween.js"></script>
 <script type="text/javascript" src="ghost.js"></script>
-
 
 <body onload="main()">
 <canvas id="gl-canvas" width="830" height="512">

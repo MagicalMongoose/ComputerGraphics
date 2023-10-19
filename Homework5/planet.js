@@ -64,22 +64,21 @@ function scale4(a, b, c) {
     return result;
 }
 
-var backCircleCount = 180;
-var circlePointCount = 360;
-var frontCircleCount = 180;
+var ringDetail = 180;
+var planetPointCount = 360;
 var colorPresets = [vec4(1,0.5,0.5,1), vec4(1,0,0,1), vec4(1,1,.25,1), vec4(0,1,0,1)];
 var ringCount = 4;
 var ringDistanceOffset = 2;
 
 function GenerateRing(x,y, radius, color, back)
 {
-    for (var i = 0; i < backCircleCount; i++)
+    for (var i = 0; i < ringDetail; i++)
     {
-        x = radius * Math.cos(i)/1.618;
+        x = radius * Math.cos(i)/Ratio;
         if (back)
-            y = Math.abs(radius * Math.sin(i)/3.236); //back half of rings
+            y = Math.abs(radius * Math.sin(i)/(Ratio*2)); //back half of rings
         else
-            y = -Math.abs(radius * Math.sin(i)/3.236); //front half of rings
+            y = -Math.abs(radius * Math.sin(i)/(Ratio*2)); //front half of rings
         points.push(vec2(x, y));
 
         colors.push(color);
@@ -99,7 +98,7 @@ function GenerateBackCircles()
         GenerateRing(x,y,i+ringDistanceOffset, colorPresets[i], true);
     }
 
-    gl.drawArrays(gl.POINTS, 0, backCircleCount*ringCount);
+    gl.drawArrays(gl.POINTS, 0, ringDetail*ringCount);
 }
 
 function GenerateCircle()
@@ -107,7 +106,7 @@ function GenerateCircle()
     modelViewMatrix = mat4(); //default identity matrix
     var radius = 0.75;
     var x,y;
-    for (var i = 0; i < circlePointCount; i++)
+    for (var i = 0; i < planetPointCount; i++)
     {
         x = radius * Math.cos(i)/Ratio; //divide by golden ratio to set it back to a circle
         y = radius * Math.sin(i);
@@ -115,7 +114,7 @@ function GenerateCircle()
         colors.push(vec4(.8,.8,0,1)); //yellow
     }
 
-    gl.drawArrays(gl.TRIANGLE_FAN, backCircleCount*4, circlePointCount);
+    gl.drawArrays(gl.TRIANGLE_FAN, ringDetail*4, planetPointCount);
 }
 
 function GenerateFrontCircles()
@@ -131,7 +130,7 @@ function GenerateFrontCircles()
         GenerateRing(x,y,i+ringDistanceOffset, colorPresets[i], false);
     }
 
-    gl.drawArrays(gl.POINTS, backCircleCount*4+circlePointCount, frontCircleCount*ringCount);
+    gl.drawArrays(gl.POINTS, ringDetail*4+planetPointCount, ringDetail*ringCount);
 }
 
 
