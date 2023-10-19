@@ -68,17 +68,101 @@ function scale4(a, b, c)
 
 function GeneratePoints() 
 {
-    GeneratePlanet();
+    GenerateSky();
+    GenerateGround();
+    GenerateStars();
+    GenerateMountains();
     //GenerateGhost();
+    //GeneratePlanet();
 }
+
+function GenerateSky()
+{
+    points.push(vec2(-8, 8)); //top left
+    colors.push(vec4(75/256, 0/256, 130/256, 1));
+
+    points.push(vec2(8, 8)); //top right
+    colors.push(vec4(75/256, 0/256, 130/256, 1)); 
+
+    points.push(vec2(8, 0)); //bottom right
+    colors.push(vec4(238/256, 130/256, 238/256, 1)); 
+    
+    points.push(vec2(-8, 0)); //bottom left
+    colors.push(vec4(238/256, 130/256, 238/256, 1)); 
+}
+
+function DrawSky()
+{
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4); // body
+}
+
+function GenerateGround()
+{
+    points.push(vec2(-8, 0)); //top left
+    colors.push(vec4(0/256, 100/256, 0/256, 1)); 
+
+    points.push(vec2(8, 0)); //top right
+    colors.push(vec4(0/256, 100/256, 0/256, 1)); 
+
+    points.push(vec2(8, -8)); //bottom right
+    colors.push(vec4(107/256, 142/256, 35/256, 1)); 
+    
+    points.push(vec2(-8, -8)); //bottom left
+    colors.push(vec4(107/256, 142/256, 35/256, 1));
+}
+
+function DrawGround()
+{
+    gl.drawArrays(gl.TRIANGLE_FAN, 4, 4); // body
+}
+
+function GenerateStars()
+{
+    points.push(vec2(0, .25));  //up
+    points.push(vec2(-.25, 0)); //left
+    points.push(vec2(0, -.25)); //down 
+    points.push(vec2(.25, 0));  //right
+
+    colors.push(vec4(255/256, 255/256, 0/256, 1)); //yellow
+    colors.push(vec4(255/256, 255/256, 0/256, 1)); //yellow
+    colors.push(vec4(255/256, 255/256, 0/256, 1)); //yellow
+    colors.push(vec4(255/256, 255/256, 0/256, 1)); //yellow
+    colors.push(vec4(255/256, 255/256, 0/256, 1)); //yellow
+}
+
+function DrawStars()
+{
+    var starCount = 20;
+    var starPoints = 5
+    var starSize = 4;
+    modelViewMatrix = mult(modelViewMatrix, scale4(1/starSize, Ratio/starSize, 1)); 
+    for (var i = 0; i < starCount; i++)
+    {
+        modelViewMatrix = mult(modelViewMatrix, translate(Math.random(), Math.random(), 0));
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+        gl.drawArrays(gl.TRIANGLE_FAN, 8, starPoints*starCount);
+    }
+    //gl.drawArrays(gl.TRIANGLE_FAN, 8, starPoints*starCount);
+}
+
+function GenerateMountains()
+{
+
+}
+
+function DrawMountains()
+{
+
+}
+
 
 function GenerateRing(radius, color, back)
 {
     var x,y;
     for (var i = 0; i < ringDetail; i++)
     {
-        x = radius * Math.cos(i)/Ratio;
-        y = Math.abs(radius * Math.sin(i)/(Ratio*2)); //back half of rings
+        x = radius * Math.cos(i);
+        y = Math.abs(radius * Math.sin(i)); //back half of rings
         if (back)
             y = -y; //front half of rings
         points.push(vec2(x, y));
@@ -139,6 +223,7 @@ function DrawGhost()
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.drawArrays(gl.LINE_STRIP, 178, 9);  // right eye
     gl.drawArrays(gl.TRIANGLE_FAN, 187, 7);  // right eye ball
+    modelViewMatrix = mat4();
 }
 
 //do modelViewMatrix here
@@ -152,19 +237,19 @@ function DrawFullPlanet()
 
 	t = mult(modelViewMatrix, translate(-4, 5, 0));
     r = mult(modelViewMatrix, rotate(ringRotationAngle, 0, 0, 1));
-    s = mult(modelViewMatrix, scale4(.5, .5, 1));
+    s = mult(modelViewMatrix, scale4(.5, .35, 1));
     modelViewMatrix = mult(modelViewMatrix, t);
+    modelViewMatrix = mult(modelViewMatrix, r);
     modelViewMatrix = mult(modelViewMatrix, s);
 
-	modelViewMatrix = mult(modelViewMatrix, scale4(1, 1.618, 1));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     // draw planet circle
 
-    modelViewMatrix = mult(modelViewMatrix, r);
+    //modelViewMatrix = mult(modelViewMatrix, r);
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-    gl.drawArrays(gl.POINTS, 0, ringDetail*ringCount);
-    gl.drawArrays(gl.TRIANGLE_FAN, ringDetail*ringCount, planetPointCount); //issue
-    gl.drawArrays(gl.POINTS, ringDetail*4+planetPointCount, ringDetail*ringCount);
+    gl.drawArrays(gl.POINTS, 194, ringDetail*ringCount); //account for Ghost points
+    gl.drawArrays(gl.TRIANGLE_FAN, (ringDetail*ringCount)+194, planetPointCount); //issue
+    gl.drawArrays(gl.POINTS, 194+(ringDetail*ringCount)+planetPointCount, ringDetail*ringCount);
 }
 
 function render() 
@@ -174,12 +259,12 @@ function render()
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
        // draw ground and sky first
-
+        DrawSky();
+        DrawGround();
        // draw stars and mountains
-
-       // then, draw back rings, planet, front rings
-        DrawFullPlanet();
-
+        DrawStars();
+        DrawMountains();
+        
         // then, draw ghost
         modelViewMatrix = mat4();
         modelViewMatrix = mult(modelViewMatrix, translate(-3, -2, 0));
@@ -187,5 +272,7 @@ function render()
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
         //DrawGhost();
 
+        // then, draw back rings, planet, front rings
+        //DrawFullPlanet();
        // add other things, like bow, arrow, spider, flower, tree ...
 }
