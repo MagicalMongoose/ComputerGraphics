@@ -22,7 +22,7 @@ function main() {
     GeneratePoints();
 
     modelViewMatrix = mat4();
-    projectionMatrix = ortho(-8, 8, -8, 8, -1, 1);
+    projectionMatrix = ortho(-8, 8, -8, 8, -8, 8);
 
     initWebGL();
 
@@ -229,58 +229,6 @@ function DrawMountains()
     pointCount += mountainPoints*mountainCount;
 }
 
-
-function GenerateRing(radius, color, back)
-{
-    var x,y;
-    for (var i = 0; i < ringDetail; i++)
-    {
-        x = radius * Math.cos(i);
-        y = Math.abs(radius * Math.sin(i)); //back half of rings
-        if (back)
-            y = -y; //front half of rings
-        points.push(vec2(x, y));
-        colors.push(color);
-    }
-}
-
-var ringDetail = 180;
-var ringCount = 4;
-var planetPointCount = 360;
-function GeneratePlanet() 
-{
-    var planetColorPresets = [vec4(1,0.5,0.5,1), vec4(1,0,0,1), vec4(1,1,.25,1), vec4(0,1,0,1)];
-    var ringCount = 4;
-    var ringDistanceOffset = 2;
-    var x, y;
-    //back rings
-    for (var i = 0; i < ringCount; i++)
-    {
-        GenerateRing(i+ringDistanceOffset, planetColorPresets[i], false); //issue 
-    }
-
-    //planet ball
-	var Radius = 1.0;
-	var numPoints = 80;
-
-	// TRIANGLE_FAN : for solid circle
-	for( var i=0; i<numPoints; i++ ) 
-    {
-		var Angle = i * (2.0 * Math.PI/numPoints);
-		var X = Math.cos(Angle) * Radius;
-		var Y = Math.sin(Angle) * Radius;
-        colors.push(vec4(0.7, 0.7, 0, 1));  
-		points.push(vec2(X, Y));
-	}
-    
-    //front rings
-    for (var i = 0; i < ringCount; i++)
-    {
-        GenerateRing(i+ringDistanceOffset, planetColorPresets[i], true); //issue 
-    }
-
-}
-
 function DrawGhost() 
 {
     let x = -30;
@@ -317,30 +265,95 @@ function DrawGhost()
     modelViewMatrix = mat4();
 }
 
+var ringDetail = 180;
+var ringCount = 4;
+var ringDistanceOffset = 2;
+var ringColorPresets = [vec4(1,0.5,0.5,1), vec4(1,0,0,1), vec4(1,1,.25,1), vec4(0,1,0,1)];
+
+var planetPointCount = 360; //first 30 points are green from ring???
+var planetRadius = 1;
+
+//generates ringDetail * ringCount points
+function GenerateRing(radius, color, front)
+{
+    for (var i = 0; i < ringDetail; i++)
+    {
+        let x = radius * Math.cos(i);
+        let y = Math.abs(radius * Math.sin(i));     //back half of rings
+        if (front) {y = -y;}                        //front half of rings
+        points.push(vec2(x, y));
+        colors.push(color); //color array misalignment 
+    }
+}
+
+//generates 2*(ringDetail*ringCounts) + planetPointCount
+function GeneratePlanet() 
+{
+    //back rings
+    for (var i = 0; i < ringCount; i++)
+    {GenerateRing(i+ringDistanceOffset, ringColorPresets[i], false);} //issue
+
+    //planet ball
+	for( var i = 0; i < planetPointCount; i++ ) 
+    {
+		var Angle = i * (2.0 * Math.PI / planetPointCount);
+		var X = Math.cos(Angle) * planetRadius;
+		var Y = Math.sin(Angle) * planetRadius;
+		points.push(vec2(X, Y));
+        colors.push(vec4(0.7, 0.7, 0, 1));
+	}
+    
+    //front rings
+    for (var i = 0; i < ringCount; i++)
+    {GenerateRing(i+ringDistanceOffset, ringColorPresets[i], true);} //issue 
+}
+
 //do modelViewMatrix here
 function DrawFullPlanet() 
 {
+    var x = -5;
+    var y = 5;
     var t; //translation
     var r; //rotation
     var s; //scale
-    var ringRotationAngle = 70;
-	modelViewMatrix = mat4(); //redundant
+    var ringRotationAngle = 70; //70
 
-	t = mult(modelViewMatrix, translate(-4, 5, 0));
+	modelViewMatrix = mat4(); //redundant
+	t = mult(modelViewMatrix, translate(x, y, 0));
     r = mult(modelViewMatrix, rotate(ringRotationAngle, 0, 0, 1));
-    s = mult(modelViewMatrix, scale4(.5, .35, 1));
+    s = mult(modelViewMatrix, scale4(.5, .5/Ratio, 1));
     modelViewMatrix = mult(modelViewMatrix, t);
     modelViewMatrix = mult(modelViewMatrix, r);
     modelViewMatrix = mult(modelViewMatrix, s);
-
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-    // draw planet circle
 
-    //modelViewMatrix = mult(modelViewMatrix, r);
+    //back rings 
+    gl.drawArrays(gl.POINTS, pointCount, ringDetail*ringCount);
+    pointCount += ringDetail*ringCount
+
+    modelViewMatrix = mat4();
+    modelViewMatrix = mult(modelViewMatrix, t);
+    modelViewMatrix = mult(modelViewMatrix, scale4(1, 1, 1));
+    modelViewMatrix = mult(modelViewMatrix, scale4(1/Ratio, 1, 1));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-    gl.drawArrays(gl.POINTS, 194, ringDetail*ringCount); //account for Ghost points
-    gl.drawArrays(gl.TRIANGLE_FAN, (ringDetail*ringCount)+194, planetPointCount); //issue
-    gl.drawArrays(gl.POINTS, 194+(ringDetail*ringCount)+planetPointCount, ringDetail*ringCount);
+
+    //planet ball
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount+30, planetPointCount-30); //idk why but 30 fixes it
+    pointCount += planetPointCount;
+
+    //figure out how to use modelViewStack for this 
+    modelViewMatrix = mat4(); //redundant
+	t = mult(modelViewMatrix, translate(x, y, 0));
+    r = mult(modelViewMatrix, rotate(ringRotationAngle, 0, 0, 1));
+    s = mult(modelViewMatrix, scale4(.5, .5/Ratio, 1));
+    modelViewMatrix = mult(modelViewMatrix, t);
+    modelViewMatrix = mult(modelViewMatrix, r);
+    modelViewMatrix = mult(modelViewMatrix, s);
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+
+    //front rings 
+    gl.drawArrays(gl.POINTS, pointCount, ringDetail*ringCount);
+    pointCount += ringDetail*ringCount;
 }
 
 function render() 
