@@ -6,7 +6,7 @@ var projectionMatrix;
 var projectionMatrixLoc;
 var modelViewStack=[];
 var Ratio = 1.618;
-
+var pointCount = 0;
 var cmtStack=[];
 
 var points=[];
@@ -76,6 +76,7 @@ function GeneratePoints()
     //GeneratePlanet();
 }
 
+//4 points
 function GenerateSky()
 {
     points.push(vec2(-8, 8)); //top left
@@ -89,6 +90,8 @@ function GenerateSky()
     
     points.push(vec2(-8, 0)); //bottom left
     colors.push(vec4(238/256, 130/256, 238/256, 1)); 
+
+    pointCount += 4;
 }
 
 function DrawSky()
@@ -96,6 +99,7 @@ function DrawSky()
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4); // body
 }
 
+//4 points
 function GenerateGround()
 {
     points.push(vec2(-8, 0)); //top left
@@ -109,6 +113,8 @@ function GenerateGround()
     
     points.push(vec2(-8, -8)); //bottom left
     colors.push(vec4(107/256, 142/256, 35/256, 1));
+
+    pointCount += 4;
 }
 
 function DrawGround()
@@ -116,43 +122,85 @@ function DrawGround()
     gl.drawArrays(gl.TRIANGLE_FAN, 4, 4); // body
 }
 
-function GenerateStars()
-{
-    points.push(vec2(0, .25));  //up
-    points.push(vec2(-.25, 0)); //left
-    points.push(vec2(0, -.25)); //down 
-    points.push(vec2(.25, 0));  //right
 
-    colors.push(vec4(255/256, 255/256, 0/256, 1)); //yellow
-    colors.push(vec4(255/256, 255/256, 0/256, 1)); //yellow
-    colors.push(vec4(255/256, 255/256, 0/256, 1)); //yellow
-    colors.push(vec4(255/256, 255/256, 0/256, 1)); //yellow
-    colors.push(vec4(255/256, 255/256, 0/256, 1)); //yellow
+const starCount = 20;
+const starPoints = 5
+const starSize = .25;
+const starCoords =
+[
+    vec2(-17, 6), vec2(-15, 16), vec2(-5, 17), vec2(-14, 13), vec2(12, 8),   
+    vec2(-7, 14), vec2(-13, 7), vec2(11, 15), vec2(21, 10), vec2(-2, 17), vec2(-1, 18), 
+    vec2(5, 12), vec2(12, 16),  vec2(16, 10), vec2(8, 14), vec2(0, 10),   
+    vec2(20, 11), vec2(14, 12),  vec2(17, 13), vec2(-12, 16), 
+];
+
+//5 points per star
+//Generate a single star given x, y
+function GenerateStar(x, y)
+{
+    points.push(vec2(x,         y + starSize)); //up
+    points.push(vec2(x - starSize,  y)); //left
+    points.push(vec2(x,         y - starSize)); //down
+    points.push(vec2(x + starSize,  y)); //right
+    points.push(vec2(x,         y + starSize)); //up
+
+    for (var i = 0; i < starPoints; i++)
+    {
+        colors.push(vec4(1, 1, 0, 1)); //yellow
+    }
 }
 
+//Use starCoords array to generate stars
+function GenerateStars()
+{    
+    for (var i = 0; i < starCoords.length; i++)
+    {
+        let x = starCoords[i][0];
+        let y = starCoords[i][1];
+        GenerateStar(x, y);
+    }
+}
+
+//Render the stars
 function DrawStars()
 {
-    var starCount = 20;
-    var starPoints = 5
-    var starSize = 4;
-    modelViewMatrix = mult(modelViewMatrix, scale4(1/starSize, Ratio/starSize, 1)); 
+    modelViewMatrix = mult(modelViewMatrix, scale4(starSize, starSize*Ratio, 1)); 
     for (var i = 0; i < starCount; i++)
     {
-        modelViewMatrix = mult(modelViewMatrix, translate(Math.random(), Math.random(), 0));
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-        gl.drawArrays(gl.TRIANGLE_FAN, 8, starPoints*starCount);
+        gl.drawArrays(gl.TRIANGLE_FAN, pointCount + i*starPoints, starPoints);
     }
-    //gl.drawArrays(gl.TRIANGLE_FAN, 8, starPoints*starCount);
+    pointCount += starPoints*starCount;
+}
+
+const mountainCount = 7;
+const mountainPoints = 3;
+
+function GenerateMountain(x, y)
+{
+    points.push(vec2(x, y));
 }
 
 function GenerateMountains()
 {
-
+    for (var i = 0; i < mountainCount; i++)
+    {
+        //generate peak of mountain position
+        let x = -32 + Math.random()*32;
+        let y = -8 + Math.random()*16; 
+        GenerateMountain(x, y);
+    }
 }
 
 function DrawMountains()
 {
-
+    modelViewMatrix = mult(modelViewMatrix, scale4(starSize, starSize*Ratio, 1)); 
+    for (var i = 0; i < starCount; i++)
+    {
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+        gl.drawArrays(gl.TRIANGLE_FAN, pointCount + i*starPoints, starPoints);
+    }
+    pointCount += mountainCount*3;
 }
 
 
@@ -175,14 +223,14 @@ var ringCount = 4;
 var planetPointCount = 360;
 function GeneratePlanet() 
 {
-    var colorPresets = [vec4(1,0.5,0.5,1), vec4(1,0,0,1), vec4(1,1,.25,1), vec4(0,1,0,1)];
+    var planetColorPresets = [vec4(1,0.5,0.5,1), vec4(1,0,0,1), vec4(1,1,.25,1), vec4(0,1,0,1)];
     var ringCount = 4;
     var ringDistanceOffset = 2;
     var x, y;
     //back rings
     for (var i = 0; i < ringCount; i++)
     {
-        GenerateRing(i+ringDistanceOffset, colorPresets[i], false); //issue 
+        GenerateRing(i+ringDistanceOffset, planetColorPresets[i], false); //issue 
     }
 
     //planet ball
@@ -202,7 +250,7 @@ function GeneratePlanet()
     //front rings
     for (var i = 0; i < ringCount; i++)
     {
-        GenerateRing(i+ringDistanceOffset, colorPresets[i], true); //issue 
+        GenerateRing(i+ringDistanceOffset, planetColorPresets[i], true); //issue 
     }
 
 }
