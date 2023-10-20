@@ -1,4 +1,5 @@
 /** @type {WebGLRenderingContext} */
+var funMode = false;
 var gl;
 var modelViewMatrix=mat4(); // identity
 var modelViewMatrixLoc;
@@ -72,8 +73,8 @@ function GeneratePoints()
     GenerateGround();
     GenerateStars();
     GenerateMountains();
-    //GenerateGhost();
-    //GeneratePlanet();
+    GenerateGhost();
+    GeneratePlanet();
 }
 
 //4 points
@@ -169,18 +170,23 @@ function DrawStars()
         gl.drawArrays(gl.TRIANGLE_FAN, pointCount + i*starPoints, starPoints);
     }
     pointCount += starPoints*starCount;
+    modelViewMatrix = mat4();
 }
 
 const mountainCount = 7;
 const mountainPoints = 3;
+const mountainSize = 0.05;
 //3 points per mountain, and 7 mountains
 function GenerateMountain(x, y)
 {
     points.push(vec2(x, y)); //tip of the mountain
-    colors.push(vec4(.9, .9, .9, 1));
+    if (funMode)
+        {colors.push(vec4(Math.random(), Math.random(), Math.random(), 1));} //activate fun mode
+    else
+        {colors.push(vec4(.9, .9, .9, 1));}
     
     let minWidth = y*2;
-    let minHeight = y*2;
+    let minHeight = y*2+5;
     let widthMultiplier = 16;
     let heightMultiplier = 3;
 
@@ -193,6 +199,8 @@ function GenerateMountain(x, y)
 
     points.push(vec2(x - width + widthRandom, y - height)); //left
     points.push(vec2(x + width + widthRandom, y - height)); //right
+    //colors.push(vec4(0/256, 100/256, 0/256, 1)); 
+    //colors.push(vec4(0/256, 100/256, 0/256, 1)); 
     colors.push(vec4(139/255/2, 69/255/2, 19/255/2, 1));
     colors.push(vec4(139/255/2, 69/255/2, 19/255/2, 1));
 }
@@ -212,13 +220,12 @@ function GenerateMountains()
 
 function DrawMountains()
 {
-    modelViewMatrix = mult(modelViewMatrix, scale4(starSize, starSize*Ratio, 1)); 
+    modelViewMatrix = mult(modelViewMatrix, scale4(mountainSize, mountainSize*Ratio, 1)); 
     for (var i = 0; i < mountainCount; i++)
     {
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
         gl.drawArrays(gl.TRIANGLE_FAN, pointCount + i*mountainPoints, mountainPoints);
     }
-    pointCount += mountainCount*3;
     pointCount += mountainPoints*mountainCount;
 }
 
@@ -276,20 +283,37 @@ function GeneratePlanet()
 
 function DrawGhost() 
 {
-    modelViewMatrix = mult(modelViewMatrix, scale4(1/20, 1/20, 1));
-    modelViewMatrix = mult(modelViewMatrix, translate(-30, 0, 0));
+    let x = -30;
+    let y = 0;
+    let scale = 1/20
+    modelViewMatrix = mult(modelViewMatrix, scale4(scale, scale, 1));
+    modelViewMatrix = mult(modelViewMatrix, translate(x, y, 0));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-    gl.drawArrays(gl.LINE_LOOP, 80, 87); // body
-    gl.drawArrays(gl.LINE_LOOP, 167, 6);  // mouth
-    gl.drawArrays(gl.LINE_LOOP, 173, 5);  // nose
 
-    gl.drawArrays(gl.LINE_LOOP, 178, 9);  // left eye
-    gl.drawArrays(gl.TRIANGLE_FAN, 187, 7);  // left eye ball
+    let bodyPointCount = 87;
+    let mouthPointCount = 6;
+    let nosePointCount = 5;
+    let eyePointCount = 9;
+    let eyeBallPointCount = 7;
 
+    gl.drawArrays(gl.LINE_LOOP, pointCount, bodyPointCount); // body
+    pointCount += bodyPointCount;
+    gl.drawArrays(gl.LINE_LOOP, pointCount, mouthPointCount);  // mouth
+    pointCount += mouthPointCount;
+    gl.drawArrays(gl.LINE_LOOP, pointCount, nosePointCount);  // nose
+    pointCount += nosePointCount;
+    
+    gl.drawArrays(gl.LINE_LOOP, pointCount, eyePointCount);  // left eye
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, eyeBallPointCount);  // left eye ball
+    
+    //copy left eye to right
     modelViewMatrix = mult(modelViewMatrix, translate(2.6, 0, 0));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-    gl.drawArrays(gl.LINE_STRIP, 178, 9);  // right eye
-    gl.drawArrays(gl.TRIANGLE_FAN, 187, 7);  // right eye ball
+
+    gl.drawArrays(gl.LINE_STRIP, pointCount, eyePointCount);  // right eye
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, eyeBallPointCount);  // right eye ball
+    pointCount += eyePointCount;
+    pointCount += eyeBallPointCount;
     modelViewMatrix = mat4();
 }
 
@@ -300,7 +324,7 @@ function DrawFullPlanet()
     var r; //rotation
     var s; //scale
     var ringRotationAngle = 70;
-	modelViewMatrix = mat4();
+	modelViewMatrix = mat4(); //redundant
 
 	t = mult(modelViewMatrix, translate(-4, 5, 0));
     r = mult(modelViewMatrix, rotate(ringRotationAngle, 0, 0, 1));
@@ -325,21 +349,21 @@ function render()
         gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
-       // draw ground and sky first
+        //draw ground and sky first
         DrawSky();
         DrawGround();
-       // draw stars and mountains
+        //draw stars and mountains
         DrawStars();
         DrawMountains();
         
-        // then, draw ghost
+        //then, draw ghost
         modelViewMatrix = mat4();
         modelViewMatrix = mult(modelViewMatrix, translate(-3, -2, 0));
         modelViewMatrix = mult(modelViewMatrix, scale4(2, 2, 1));
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-        //DrawGhost();
+        DrawGhost();
 
-        // then, draw back rings, planet, front rings
-        //DrawFullPlanet();
-       // add other things, like bow, arrow, spider, flower, tree ...
+        //then, draw back rings, planet, front rings
+        DrawFullPlanet();
+        //add other things, like bow, arrow, spider, flower, tree ...
 }
