@@ -77,6 +77,7 @@ function GeneratePoints()
     GeneratePlanet();
     GenerateBow();
     GenerateArrow();
+    GenerateString();
 }
 
 //4 points
@@ -364,37 +365,113 @@ function DrawFullPlanet()
 }
 
 const bowDetail = 180;
+const bowX = 1;
+const bowY = -4;
 
 function GenerateBow()
 {
-    for (var i = Math.PI; i < bowDetail; i += (Math.PI/bowDetail)*2)
+    for (var i = Math.PI; i < 3*Math.PI; i += (Math.PI/bowDetail)*2)
     {
         let x = i;
         let y = Math.cos(i);
         points.push(vec2(x, y));
-        colors.push(vec4(1, 1, .5, 1));
+        colors.push(vec4(1, 1, .5, 1)); //yellow
     }
 }
 
 function DrawBow()
 {
     modelViewMatrix = mat4(); 
-    modelViewMatrix = mult(modelViewMatrix, translate(-Math.PI, -5, 0));
+    modelViewMatrix = mult(modelViewMatrix, translate(bowX-Math.PI, bowY-1, 0));
     modelViewMatrix = mult(modelViewMatrix, scale4(.5, .5, 1));
     
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.drawArrays(gl.LINE_STRIP, pointCount, bowDetail);
-    pointCount += bowDetail;
+    pointCount += bowDetail+1;
 }
 
-function GenerateArrow()
-{
+var arrowX = bowX;
+var arrowY = bowY;
+const arrowLength = 2;
+const arrowDetail = 20;
+const shortLine = 0.25;
+const topFletchling = -2/3;
+const midFletchling = -3/4;
+const botFletchling = -4/5;
 
+function GenerateArrow()
+{    
+    points.push(vec2(-shortLine, -shortLine)); //left tip
+    points.push(vec2(0, 0));
+    points.push(vec2(shortLine, -shortLine)); //right tip
+    
+    points.push(vec2(0, 0));
+    points.push(vec2(0, -arrowLength)); //arrow body
+
+    //top fletchlings
+    points.push(vec2(0, topFletchling*arrowLength)); 
+    points.push(vec2(-shortLine, (topFletchling*arrowLength)-shortLine));
+    points.push(vec2(0, topFletchling*arrowLength)); 
+    points.push(vec2(shortLine, (topFletchling*arrowLength)-shortLine));
+    points.push(vec2(0, topFletchling*arrowLength)); 
+
+    //middle fletchling
+    points.push(vec2(0, midFletchling*arrowLength)); 
+    points.push(vec2(-shortLine, (midFletchling*arrowLength)-shortLine));
+    points.push(vec2(0, midFletchling*arrowLength)); 
+    points.push(vec2(shortLine, (midFletchling*arrowLength)-shortLine));
+    points.push(vec2(0, midFletchling*arrowLength));
+
+    //bottom fletchlings
+    points.push(vec2(0, botFletchling*arrowLength)); 
+    points.push(vec2(-shortLine, (botFletchling*arrowLength)-shortLine));
+    points.push(vec2(0, botFletchling*arrowLength));
+    points.push(vec2(shortLine, (botFletchling*arrowLength)-shortLine));
+    points.push(vec2(0, botFletchling*arrowLength));
+
+    for (var i = 0; i < arrowDetail; i++)
+    {
+        colors.push(vec4(1, 0, 0, 1));
+    }
 }
 
 function DrawArrow()
 {
+    modelViewMatrix = mat4(); 
+    modelViewMatrix = mult(modelViewMatrix, translate(arrowX, arrowY, 0));
+    
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays(gl.LINE_STRIP, pointCount, arrowDetail);
+    pointCount += arrowDetail; //make sure this matches the arrow vertices count
+}
 
+const stringDetail = 3;
+const arrowShot = false;
+
+function GenerateString()
+{
+    let flatString = bowY/3.3;
+    points.push(vec2(-arrowLength/2, flatString));
+    if (arrowY > bowY+1)
+        points.push(vec2(bowX-arrowLength/2, flatString)); //make string flat if arrow is shot
+    else
+        points.push(vec2(bowX-arrowLength/2, arrowY+(arrowLength)));
+    points.push(vec2(arrowLength/2, flatString));
+
+    for (var i = 0; i < stringDetail; i++)
+    {
+        colors.push(vec4(1, 1, 1, 1)); //white
+    }
+}
+
+function DrawString()
+{
+    modelViewMatrix = mat4(); 
+    modelViewMatrix = mult(modelViewMatrix, translate(bowX, bowY, 0));
+    
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays(gl.LINE_STRIP, pointCount, stringDetail);
+    pointCount += stringDetail;
 }
 
 function render() 
@@ -424,7 +501,11 @@ function render()
 
         //then, draw back rings, planet, front rings
         DrawFullPlanet();
+        console.log(pointCount);
         //add other things, like bow, arrow, spider, flower, tree ...
         DrawBow();
+        console.log(pointCount);
         DrawArrow();
+        console.log(pointCount);
+        DrawString();
 }
