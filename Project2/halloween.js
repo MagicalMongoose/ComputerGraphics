@@ -75,6 +75,8 @@ function GeneratePoints()
     GenerateMountains();
     GenerateGhost();
     GeneratePlanet();
+    GenerateBow();
+    GenerateArrow();
 }
 
 //4 points
@@ -229,6 +231,7 @@ function DrawMountains()
     pointCount += mountainPoints*mountainCount;
 }
 
+//114 points (eyes use same vertices)
 function DrawGhost() 
 {
     let x = -30;
@@ -265,21 +268,22 @@ function DrawGhost()
     modelViewMatrix = mat4();
 }
 
-var ringDetail = 180;
-var ringCount = 4;
-var ringDistanceOffset = 2;
-var ringColorPresets = [vec4(1,0.5,0.5,1), vec4(1,0,0,1), vec4(1,1,.25,1), vec4(0,1,0,1)];
+const ringDetail = 180;
+const ringCount = 4;
+const ringDistanceOffset = 2;
+const ringColorPresets = [vec4(1,0.5,0.5,1), vec4(1,0,0,1), vec4(1,1,.25,1), vec4(0,1,0,1)];
 
-var planetPointCount = 360; //first 30 points are green from ring???
-var planetRadius = 1;
+const planetPointCount = 360; //first 30 points are green from ring???
+const planetRadius = 1;
 
 //generates ringDetail * ringCount points
 function GenerateRing(radius, color, front)
 {
     for (var i = 0; i < ringDetail; i++)
     {
-        let x = radius * Math.cos(i);
-        let y = Math.abs(radius * Math.sin(i));     //back half of rings
+        let angle = i * (2 * Math.PI / ringDetail);
+        let x = radius * Math.cos(angle);
+        let y = Math.abs(radius * Math.sin(angle));     //back half of rings
         if (front) {y = -y;}                        //front half of rings
         points.push(vec2(x, y));
         colors.push(color); //color array misalignment 
@@ -292,20 +296,26 @@ function GeneratePlanet()
     //back rings
     for (var i = 0; i < ringCount; i++)
     {GenerateRing(i+ringDistanceOffset, ringColorPresets[i], false);} //issue
-
+    
+    console.log(points.length);
     //planet ball
 	for( var i = 0; i < planetPointCount; i++ ) 
     {
-		var Angle = i * (2.0 * Math.PI / planetPointCount);
+		var Angle = i * (2 * Math.PI / planetPointCount);
 		var X = Math.cos(Angle) * planetRadius;
 		var Y = Math.sin(Angle) * planetRadius;
 		points.push(vec2(X, Y));
-        colors.push(vec4(0.7, 0.7, 0, 1));
+        if (funMode)
+            {colors.push(vec4(0.7, 0.7, 0, 0.01*i));}
+        else
+            {colors.push(vec4(0.7, 0.7, 0, 1));}
 	}
     
+    console.log(points.length);
     //front rings
     for (var i = 0; i < ringCount; i++)
     {GenerateRing(i+ringDistanceOffset, ringColorPresets[i], true);} //issue 
+    console.log(points.length);
 }
 
 //do modelViewMatrix here
@@ -318,42 +328,73 @@ function DrawFullPlanet()
     var s; //scale
     var ringRotationAngle = 70; //70
 
-	modelViewMatrix = mat4(); //redundant
 	t = mult(modelViewMatrix, translate(x, y, 0));
     r = mult(modelViewMatrix, rotate(ringRotationAngle, 0, 0, 1));
-    s = mult(modelViewMatrix, scale4(.5, .5/Ratio, 1));
+    s = mult(modelViewMatrix, scale4(.5, .2/Ratio, 1));
+
+	modelViewMatrix = mat4();
     modelViewMatrix = mult(modelViewMatrix, t);
     modelViewMatrix = mult(modelViewMatrix, r);
     modelViewMatrix = mult(modelViewMatrix, s);
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
     //back rings 
-    gl.drawArrays(gl.POINTS, pointCount, ringDetail*ringCount);
+    gl.drawArrays(gl.LINE_STRIP, pointCount, ringDetail*ringCount);
     pointCount += ringDetail*ringCount
 
     modelViewMatrix = mat4();
     modelViewMatrix = mult(modelViewMatrix, t);
-    modelViewMatrix = mult(modelViewMatrix, scale4(1, 1, 1));
     modelViewMatrix = mult(modelViewMatrix, scale4(1/Ratio, 1, 1));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
     //planet ball
-    gl.drawArrays(gl.TRIANGLE_FAN, pointCount+30, planetPointCount-30); //idk why but 30 fixes it
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, planetPointCount);
     pointCount += planetPointCount;
 
     //figure out how to use modelViewStack for this 
-    modelViewMatrix = mat4(); //redundant
-	t = mult(modelViewMatrix, translate(x, y, 0));
-    r = mult(modelViewMatrix, rotate(ringRotationAngle, 0, 0, 1));
-    s = mult(modelViewMatrix, scale4(.5, .5/Ratio, 1));
+    modelViewMatrix = mat4();
     modelViewMatrix = mult(modelViewMatrix, t);
     modelViewMatrix = mult(modelViewMatrix, r);
     modelViewMatrix = mult(modelViewMatrix, s);
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
     //front rings 
-    gl.drawArrays(gl.POINTS, pointCount, ringDetail*ringCount);
+    gl.drawArrays(gl.LINE_STRIP, pointCount, ringDetail*ringCount);
     pointCount += ringDetail*ringCount;
+}
+
+const bowDetail = 180;
+
+function GenerateBow()
+{
+    for (var i = Math.PI; i < bowDetail; i += (Math.PI/bowDetail)*2)
+    {
+        let x = i;
+        let y = Math.cos(i);
+        points.push(vec2(x, y));
+        colors.push(vec4(1, 1, .5, 1));
+    }
+}
+
+function DrawBow()
+{
+    modelViewMatrix = mat4(); 
+    modelViewMatrix = mult(modelViewMatrix, translate(-Math.PI, -5, 0));
+    modelViewMatrix = mult(modelViewMatrix, scale4(.5, .5, 1));
+    
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays(gl.LINE_STRIP, pointCount, bowDetail);
+    pointCount += bowDetail;
+}
+
+function GenerateArrow()
+{
+
+}
+
+function DrawArrow()
+{
+
 }
 
 function render() 
@@ -364,10 +405,14 @@ function render()
 
         //draw ground and sky first
         DrawSky();
+        console.log(pointCount);
         DrawGround();
+        console.log(pointCount);
         //draw stars and mountains
         DrawStars();
+        console.log(pointCount);
         DrawMountains();
+        console.log(pointCount);
         
         //then, draw ghost
         modelViewMatrix = mat4();
@@ -375,8 +420,11 @@ function render()
         modelViewMatrix = mult(modelViewMatrix, scale4(2, 2, 1));
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
         DrawGhost();
+        console.log(pointCount);
 
         //then, draw back rings, planet, front rings
         DrawFullPlanet();
         //add other things, like bow, arrow, spider, flower, tree ...
+        DrawBow();
+        DrawArrow();
 }

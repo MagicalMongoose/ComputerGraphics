@@ -242,6 +242,6 @@ function GenerateGhost()
         
         // end left eye
 
-        for (var i = 0; i < 144; i++)
+        for (var i = 0; i < 114; i++)
                 colors.push(vec4(1, 1, 1, 1)); //white
 }
