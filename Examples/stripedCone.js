@@ -35,7 +35,8 @@ function main()   {
     render();
 };
 
-function ConfigWebGL()   {
+function ConfigWebGL()   
+{
     //  Configure WebGL
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -45,7 +46,8 @@ function ConfigWebGL()   {
     gl.useProgram( program );
 }
 
-function PassInfoToGPU()  {
+function PassInfoToGPU()  
+{
     // Load the data into the GPU
     bufferId = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, bufferId );
@@ -174,7 +176,7 @@ function render() {
         gl.disable(gl.CULL_FACE);
 
     // draw sides
-    for (var i = 0; i<numSlices; i++)
+    for (var i = 0; i < numSlices; i++)
     {
         if (i%2 == 1)
             gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), 1);
@@ -184,7 +186,7 @@ function render() {
     }
 
     // draw bottom
-    for (var i = 0; i<numSlices; i++)
+    for (var i = 0; i < numSlices; i++)
     {
         gl.uniform1i(gl.getUniformLocation(program, "colorIndex"), 3);
         gl.drawArrays(gl.TRIANGLES, numSlices*3+i*3, 3 );
