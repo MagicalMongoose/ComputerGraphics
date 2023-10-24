@@ -474,6 +474,7 @@ function DrawString()
     pointCount += stringDetail;
 }
 
+//update pointCount to be a simple function to add the vertices to the count, rather than a naked global variable
 function render() 
 {
         gl.clear(gl.COLOR_BUFFER_BIT );
