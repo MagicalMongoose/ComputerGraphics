@@ -130,10 +130,10 @@ const starPoints = 5
 const starSize = .25;
 const starCoords =
 [
-    vec2(-17, 6), vec2(-15, 16), vec2(-5, 17), vec2(-14, 13), vec2(12, 8),   
-    vec2(-7, 14), vec2(-13, 7), vec2(11, 15), vec2(21, 10), vec2(-2, 17), vec2(-1, 18), 
-    vec2(5, 12), vec2(12, 16),  vec2(16, 10), vec2(8, 14), vec2(0, 10),   
-    vec2(20, 11), vec2(14, 12),  vec2(17, 13), vec2(-12, 16), 
+    vec2(20, 15), vec2(-15, 16), vec2(-5, 17), vec2(-14, 13), vec2(14, 17),   
+    vec2(-7, 14), vec2(-10, 12), vec2(11, 15), vec2(21, 14), vec2(-2, 17), vec2(-1, 18), 
+    vec2(5, 12), vec2(12, 16),  vec2(16, 15), vec2(8, 14), vec2(0, 13),   
+    vec2(20, 18), vec2(14, 12),  vec2(17, 13), vec2(-12, 16), 
 ];
 
 //5 points per star, and 20 stars
@@ -167,6 +167,9 @@ function GenerateStars()
 function DrawStars()
 {
     modelViewMatrix = mult(modelViewMatrix, scale4(starSize, starSize*Ratio, 1)); 
+    modelViewMatrix = mult(modelViewMatrix, translate(0, -starSize, 0));
+    modelViewMatrix = mult(modelViewMatrix, rotate(9, 0, 0, 1));
+    modelViewMatrix = mult(modelViewMatrix, translate(0, +starSize, 0));
     for (var i = 0; i < starCount; i++)
     {
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
@@ -176,9 +179,14 @@ function DrawStars()
     modelViewMatrix = mat4();
 }
 
-const mountainCount = 7;
 const mountainPoints = 3;
-const mountainSize = 0.05;
+const mountainCoords =
+[
+    vec2(-2, 5), vec2(-20, 4), vec2(-14, 6), vec2(-5, 3), vec2(-12, 2),    
+    vec2(-17, 4), vec2(-13, 6), vec2(11, 5), vec2(21, 5), vec2(14, 4)
+];
+const mountainCount = mountainCoords.length;
+
 //3 points per mountain, and 7 mountains
 function GenerateMountain(x, y)
 {
@@ -188,10 +196,10 @@ function GenerateMountain(x, y)
     else
         {colors.push(vec4(.9, .9, .9, 1));}
     
-    let minWidth = y*2;
-    let minHeight = y*2+5;
-    let widthMultiplier = 16;
-    let heightMultiplier = 3;
+    let minWidth = 1;
+    let minHeight = y;
+    let widthMultiplier = 10;
+    let heightMultiplier = 2;
 
     let width = Math.random()*widthMultiplier + minWidth;
     let height = Math.random()*heightMultiplier + minHeight;
@@ -202,8 +210,6 @@ function GenerateMountain(x, y)
 
     points.push(vec2(x - width + widthRandom, y - height)); //left
     points.push(vec2(x + width + widthRandom, y - height)); //right
-    //colors.push(vec4(0/256, 100/256, 0/256, 1)); 
-    //colors.push(vec4(0/256, 100/256, 0/256, 1)); 
     colors.push(vec4(139/255/2, 69/255/2, 19/255/2, 1));
     colors.push(vec4(139/255/2, 69/255/2, 19/255/2, 1));
 }
@@ -213,9 +219,11 @@ function GenerateMountains()
     for (var i = 0; i < mountainCount; i++)
     {
         //generate peak of mountain position
-        let maxHeight = 10;
-        let x = -100 + Math.random()*200;
-        let y = Math.random()*maxHeight; 
+        let maxHeight = 20;
+        //let x = -100 + Math.random()*200;
+        //let y = Math.random()*maxHeight; 
+        let x = mountainCoords[i][0];
+        let y = mountainCoords[i][1];
         GenerateMountain(x, y);
     }
     
@@ -223,11 +231,11 @@ function GenerateMountains()
 
 function DrawMountains()
 {
-    modelViewMatrix = mult(modelViewMatrix, scale4(mountainSize, mountainSize*Ratio, 1)); 
+    modelViewMatrix = mat4();
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     for (var i = 0; i < mountainCount; i++)
     {
-        gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-        gl.drawArrays(gl.TRIANGLE_FAN, pointCount + i*mountainPoints, mountainPoints);
+        gl.drawArrays(gl.TRIANGLES, pointCount + i*mountainPoints, mountainPoints);
     }
     pointCount += mountainPoints*mountainCount;
 }
