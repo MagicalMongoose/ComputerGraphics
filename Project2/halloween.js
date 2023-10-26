@@ -1,5 +1,5 @@
 /** @type {WebGLRenderingContext} */
-var funMode = false;
+var funMode = true;
 var gl;
 var modelViewMatrix=mat4(); // identity
 var modelViewMatrixLoc;
@@ -23,6 +23,7 @@ function main() {
 
     modelViewMatrix = mat4();
     projectionMatrix = ortho(-8, 8, -8, 8, -8, 8);
+    projectionMatrix = mult(projectionMatrix, scale4(0.5, 0.5, 0.5));
 
     initWebGL();
 
@@ -138,10 +139,10 @@ const starPoints = 5
 const starSize = .25;
 const starCoords =
 [
-    vec2(20, 15), vec2(-15, 16), vec2(-5, 17), vec2(-14, 13), vec2(14, 17),   
-    vec2(-7, 14), vec2(-10, 12), vec2(11, 15), vec2(21, 14), vec2(-2, 17), vec2(-1, 18), 
+    vec2(20, 15), vec2(-14, 15), vec2(-5, 17), vec2(-14, 13), vec2(14, 15),   
+    vec2(-7, 14), vec2(-10, 12), vec2(11, 15), vec2(21, 14), vec2(-2, 17), vec2(-1, 15), 
     vec2(5, 12), vec2(12, 16),  vec2(16, 15), vec2(8, 14), vec2(0, 13),   
-    vec2(20, 18), vec2(14, 12),  vec2(17, 13), vec2(-12, 16), 
+    vec2(20, 13), vec2(14, 12),  vec2(17, 13), vec2(-12, 16), 
 ];
 
 //5 points per star, and 20 stars
@@ -520,4 +521,7 @@ function render()
         DrawArrow();
         console.log(pointCount);
         DrawString();
+
+        projectionMatrix = mult(projectionMatrix, rotate(0.5, [1, 1, 1]));
+        requestAnimationFrame(render);
 }
