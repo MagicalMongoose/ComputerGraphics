@@ -68,6 +68,22 @@ function scale4(a, b, c)
     return result;
 }
 
+//helper function
+function GeneratePolygon(cx, cy, r, color, circleDetail)
+{
+    let increment = (2 * Math.PI / circleDetail);
+    for (var i = 0; i < circleDetail; i++)
+    {
+        let angle = i * increment;
+        let x = cx + r * Math.cos(angle);
+        let y = cy + r * Math.sin(angle);
+        points.push(vec2(x, y));
+        colors.push(color);
+    }
+    points.push(vec2(r * Math.cos(0), r * Math.sin(0)));
+    colors.push(color);
+}
+
 function GeneratePoints() 
 {
     GenerateSky();
@@ -79,6 +95,7 @@ function GeneratePoints()
     GenerateBow();
     GenerateArrow();
     GenerateString();
+    GenerateCandy();
 }
 
 //4 points
@@ -103,7 +120,6 @@ function GenerateSky()
         colors.push(vec4(238/256, 130/256, 238/256, 1));
         colors.push(vec4(238/256, 130/256, 238/256, 1)); 
     }
-    //pointCount += points.length - pointCount
 }
 
 function DrawSky()
@@ -140,7 +156,7 @@ const starPoints = 5
 const starSize = .25;
 const starCoords =
 [
-    vec2(20, 15), vec2(-14, 15), vec2(-5, 17), vec2(-14, 13), vec2(14, 15),   
+    vec2(20, 15), vec2(-14, 14), vec2(-5, 17), vec2(-13, 13), vec2(14, 15),   
     vec2(-7, 14), vec2(-10, 12), vec2(11, 15), vec2(21, 14), vec2(-2, 17), vec2(-1, 15), 
     vec2(5, 12), vec2(12, 16),  vec2(16, 15), vec2(8, 14), vec2(0, 13),   
     vec2(20, 13), vec2(14, 12),  vec2(17, 13), vec2(-12, 16), 
@@ -192,8 +208,8 @@ function DrawStars()
 const mountainPoints = 3;
 const mountainCoords =
 [
-    vec2(-2, 2), vec2(-7, 2), vec2(-4, 2), vec2(5, 3), vec2(-3, 3),    
-    vec2(0, 1), vec2(3, 3), vec2(1, 2), vec2(4, 2), vec2(7, 1)
+    vec2(-2, 2), vec2(-7, 2), vec2(-4, 2), vec2(5, 3), vec2(-3, 1),   
+    vec2(1, 2), vec2(3, 3), vec2(2, 1), vec2(4, 2), vec2(7, 1)
 ];
 const mountainCount = mountainCoords.length;
 
@@ -207,7 +223,7 @@ function GenerateMountain(x, y)
         {colors.push(vec4(.9, .9, .9, 1));}
     
     let minWidth = 1;
-    let minHeight = y;
+    let minHeight = y/2;
     let heightMultiplier = 2;
 
     let width = minWidth;
@@ -289,10 +305,10 @@ function DrawGhost()
 
 const ringDetail = 180;
 const ringCount = 4;
-const ringDistanceOffset = 2;
+const ringDistanceOffset = 3;
 const ringColorPresets = [vec4(1,0.5,0.5,1), vec4(1,0,0,1), vec4(1,1,.25,1), vec4(0,1,0,1)];
 
-const planetPointCount = 360; //first 30 points are green from ring???
+const planetDetail = 360;
 const planetRadius = 1;
 
 //generates ringDetail * ringCount points
@@ -305,7 +321,7 @@ function GenerateRing(radius, color, front)
         let y = Math.abs(radius * Math.sin(angle));     //back half of rings
         if (front) {y = -y;}                        //front half of rings
         points.push(vec2(x, y));
-        colors.push(color); //color array misalignment 
+        colors.push(color);
     }
 }
 
@@ -316,25 +332,27 @@ function GeneratePlanet()
     for (var i = 0; i < ringCount; i++)
     {GenerateRing(i+ringDistanceOffset, ringColorPresets[i], false);} //issue
     
-    //console.log(points.length);
     //planet ball
-	for( var i = 0; i < planetPointCount; i++ ) 
+    var planetColor = vec4(0.7, 0.7, 0, 1);
+    if (funMode)
     {
-		var Angle = i * (2 * Math.PI / planetPointCount);
-		var X = Math.cos(Angle) * planetRadius;
-		var Y = Math.sin(Angle) * planetRadius;
-		points.push(vec2(X, Y));
-        if (funMode)
-            {colors.push(vec4(0.7, 0.7, 0, 0.01*i));}
-        else
-            {colors.push(vec4(0.7, 0.7, 0, 1));}
-	}
-    
-    //console.log(points.length);
+        for( var i = 0; i < planetDetail; i++ ) 
+        {
+            var planetAngle = i * (2 * Math.PI / planetDetail);
+            var X = Math.cos(planetAngle) * planetRadius;
+            var Y = Math.sin(planetAngle) * planetRadius;
+            points.push(vec2(X, Y));
+            colors.push(vec4(0.7, 0.7, 0, 0.01*i));
+        }
+        points.push(vec2(Math.cos(0) * planetRadius, Math.sin(0) * planetRadius));
+        colors.push(vec4(0.7, 0.7, 0, 0.01*i));
+    }
+    else
+    {GeneratePolygon(0, 0, planetRadius, planetColor, planetDetail);}
+
     //front rings
     for (var i = 0; i < ringCount; i++)
-    {GenerateRing(i+ringDistanceOffset, ringColorPresets[i], true);} //issue 
-    //console.log(points.length);
+    {GenerateRing(i+ringDistanceOffset, ringColorPresets[i], true);} //issue
 }
 
 //do modelViewMatrix here
@@ -367,8 +385,8 @@ function DrawFullPlanet()
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
     //planet ball
-    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, planetPointCount);
-    pointCount += planetPointCount;
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, planetDetail);
+    pointCount += planetDetail+1;
 
     //figure out how to use modelViewStack for this 
     modelViewMatrix = mat4();
@@ -383,7 +401,7 @@ function DrawFullPlanet()
 }
 
 const bowDetail = 180;
-const bowX = 1;
+const bowX = 0;
 const bowY = -4;
 
 function GenerateBow()
@@ -473,7 +491,7 @@ function GenerateString()
     if (arrowY > bowY+1)
         points.push(vec2(bowX-arrowLength/2, flatString)); //make string flat if arrow is shot
     else
-        points.push(vec2(bowX-arrowLength/2, arrowY+(arrowLength)));
+        points.push(vec2(bowX, arrowY+(arrowLength)));
     points.push(vec2(arrowLength/2, flatString));
 
     for (var i = 0; i < stringDetail; i++)
@@ -492,37 +510,39 @@ function DrawString()
     pointCount += stringDetail;
 }
 
-//update pointCount to be a simple function to add the vertices to the count, rather than a naked global variable
+const candyDetail = 50;
+const candyRadius = 3;
+function GenerateCandy()
+{
+    GeneratePolygon(0, 0, candyRadius, vec4(1, 1, 1, 1), candyDetail);
+}
+
+function DrawCandy()
+{
+    modelViewMatrix = mat4(); 
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays(gl.LINE_STRIP, pointCount, candyDetail+1);
+    pointCount += candyDetail+1;
+}
+
+//update pointCount to be a simple function to add the vertices to the count,
+//rather than a naked global variable
 function render() 
 {
         gl.clear(gl.COLOR_BUFFER_BIT );
         gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
         
-        //draw ground and sky first
         DrawSky();
-        //console.log(pointCount);
         DrawGround();
-        //console.log(pointCount);
-        //draw stars and mountains
         DrawStars();
-        //console.log(pointCount);
         DrawMountains();
-        //console.log(pointCount);
-        
-        //then, draw ghost
         DrawGhost();
-        //console.log(pointCount);
-
-        //then, draw back rings, planet, front rings
         DrawFullPlanet();
-        //console.log(pointCount);
-        //add other things, like bow, arrow, spider, flower, tree ...
         DrawBow();
-        //console.log(pointCount);
         DrawArrow();
-        //console.log(pointCount);
         DrawString();
+        DrawCandy();
 
         //projectionMatrix = mult(projectionMatrix, rotate(0.5, [1, 1, 1])); //funny spin
         //requestAnimationFrame(render);
