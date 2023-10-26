@@ -68,20 +68,39 @@ function scale4(a, b, c)
     return result;
 }
 
-//helper function
-function GeneratePolygon(cx, cy, r, color, circleDetail)
+//used in a loop, returns color vector
+function hueToRGB(i, detail)
 {
-    let increment = (2 * Math.PI / circleDetail);
-    for (var i = 0; i < circleDetail; i++)
+    const frequency = (2 * Math.PI) / detail;
+    //Hue rotation
+    const red = (Math.sin(frequency * i + 0) * 127 + 128)/255;
+    const green = (Math.sin(frequency * i + (2 * Math.PI / 3)) * 127 + 128)/255;
+    const blue = (Math.sin(frequency * i + (4 * Math.PI / 3)) * 127 + 128)/255;
+    return vec4(red,green,blue,1);
+}
+
+//helper function
+function GeneratePolygon(cx, cy, r, color, polygonDetail)
+{
+    let increment = (2 * Math.PI / polygonDetail);
+    for (var i = 0; i < polygonDetail; i++)
     {
         let angle = i * increment;
         let x = cx + r * Math.cos(angle);
         let y = cy + r * Math.sin(angle);
         points.push(vec2(x, y));
-        colors.push(color);
+        if (funMode)
+        {colors.push(hueToRGB(i, polygonDetail));}
+        else
+        {colors.push(color);}
     }
     points.push(vec2(r * Math.cos(0), r * Math.sin(0)));
-    colors.push(color);
+    if (funMode)
+    {
+        //colors.push(vec4(0,0,0,1));
+    }
+    else
+    {colors.push(color);}
 }
 
 function GeneratePoints() 
@@ -342,7 +361,7 @@ function GeneratePlanet()
             var X = Math.cos(planetAngle) * planetRadius;
             var Y = Math.sin(planetAngle) * planetRadius;
             points.push(vec2(X, Y));
-            colors.push(vec4(0.7, 0.7, 0, 0.01*i));
+            colors.push(hueToRGB(i, planetDetail));
         }
         points.push(vec2(Math.cos(0) * planetRadius, Math.sin(0) * planetRadius));
         colors.push(vec4(0.7, 0.7, 0, 0.01*i));
@@ -511,18 +530,88 @@ function DrawString()
 }
 
 const candyDetail = 50;
-const candyRadius = 3;
+const candyRadius = 5;
 function GenerateCandy()
 {
-    GeneratePolygon(0, 0, candyRadius, vec4(1, 1, 1, 1), candyDetail);
+    var width = 12;
+    var height = 6;
+
+    //left side
+    points.push(vec2(0, 0));
+    points.push(vec2(-width, height));
+    points.push(vec2(-width, -height));
+    points.push(vec2(0, 0));
+    colors.push(vec4(1, 0, 0, .1));
+    colors.push(vec4(1, 0, 0, 1));
+    colors.push(vec4(1, 0, 0, 1));
+    colors.push(vec4(1, 0, 0, .1));
+
+    //right side
+    points.push(vec2(0, 0));
+    points.push(vec2(width, height));
+    points.push(vec2(width, -height));
+    points.push(vec2(0, 0));
+    colors.push(vec4(1, 0, 0, .1));
+    colors.push(vec4(1, 0, 0, 1));
+    colors.push(vec4(1, 0, 0, 1));
+    colors.push(vec4(1, 0, 0, .1));
+
+    //candy ball part
+    GeneratePolygon(0, 0, candyRadius, vec4(0.6, 0.1, 0.7, 1), candyDetail);
 }
 
+//draw pile of candies
 function DrawCandy()
 {
     modelViewMatrix = mat4(); 
+    const wholeCandyDetail = candyDetail + 12;
+    var scale = 0.1;
+    var s = scale4(scale/Ratio, scale, 1);
+
+
+    modelViewMatrix = mult(modelViewMatrix, s);
+    modelViewMatrix = mult(modelViewMatrix, translate(70, -60, 1));
+    modelViewMatrix = mult(modelViewMatrix, rotate(20, 0, 0, 1));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-    gl.drawArrays(gl.LINE_STRIP, pointCount, candyDetail+1);
-    pointCount += candyDetail+1;
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
+
+    modelViewMatrix = mat4();
+    modelViewMatrix = mult(modelViewMatrix, s);
+    modelViewMatrix = mult(modelViewMatrix, translate(75, -60, 1));
+    modelViewMatrix = mult(modelViewMatrix, rotate(-30, 0, 0, 1));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
+
+    modelViewMatrix = mat4();
+    modelViewMatrix = mult(modelViewMatrix, s);
+    modelViewMatrix = mult(modelViewMatrix, translate(80, -70, 1));
+    modelViewMatrix = mult(modelViewMatrix, rotate(30, 0, 0, 1));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
+
+    modelViewMatrix = mat4();
+    modelViewMatrix = mult(modelViewMatrix, s);
+    modelViewMatrix = mult(modelViewMatrix, translate(50, -70, 1));
+    modelViewMatrix = mult(modelViewMatrix, rotate(-30, 0, 0, 1));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
+
+    modelViewMatrix = mat4();
+    modelViewMatrix = mult(modelViewMatrix, s);
+    modelViewMatrix = mult(modelViewMatrix, translate(55, -60, 1));
+    modelViewMatrix = mult(modelViewMatrix, rotate(80, 0, 0, 1));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
+
+    modelViewMatrix = mat4();
+    modelViewMatrix = mult(modelViewMatrix, s);
+    modelViewMatrix = mult(modelViewMatrix, translate(63, -70, 1));
+    modelViewMatrix = mult(modelViewMatrix, rotate(10, 0, 0, 1));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
+
+    modelViewMatrix = mat4();
+    pointCount += wholeCandyDetail;
 }
 
 //update pointCount to be a simple function to add the vertices to the count,
@@ -544,6 +633,7 @@ function render()
         DrawString();
         DrawCandy();
 
-        //projectionMatrix = mult(projectionMatrix, rotate(0.5, [1, 1, 1])); //funny spin
+        //funny spin
+        //projectionMatrix = mult(projectionMatrix, rotate(0.5, [1, 1, 1])); 
         //requestAnimationFrame(render);
 }
