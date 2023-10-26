@@ -84,16 +84,24 @@ function GeneratePoints()
 function GenerateSky()
 {
     points.push(vec2(-8, 8)); //top left
-    colors.push(vec4(75/256, 0/256, 130/256, 1));
-
     points.push(vec2(8, 8)); //top right
-    colors.push(vec4(75/256, 0/256, 130/256, 1)); 
-
     points.push(vec2(8, 0)); //bottom right
-    colors.push(vec4(238/256, 130/256, 238/256, 1)); 
-    
     points.push(vec2(-8, 0)); //bottom left
-    colors.push(vec4(238/256, 130/256, 238/256, 1)); 
+
+    if (funMode)
+    {
+        for (var i = 0; i < 4; i++)
+        {
+            colors.push(vec4((Math.random()*255)/255, (Math.random()*255)/255, (Math.random()*255)/255, 1));
+        }
+    }
+    else
+    {
+        colors.push(vec4(75/256, 0/256, 130/256, 1));
+        colors.push(vec4(75/256, 0/256, 130/256, 1)); 
+        colors.push(vec4(238/256, 130/256, 238/256, 1));
+        colors.push(vec4(238/256, 130/256, 238/256, 1)); 
+    }
 }
 
 function DrawSky()
@@ -182,8 +190,8 @@ function DrawStars()
 const mountainPoints = 3;
 const mountainCoords =
 [
-    vec2(-2, 5), vec2(-20, 4), vec2(-14, 6), vec2(-5, 3), vec2(-12, 2),    
-    vec2(-17, 4), vec2(-13, 6), vec2(11, 5), vec2(21, 5), vec2(14, 4)
+    vec2(-2, 2), vec2(-7, 2), vec2(-4, 2), vec2(5, 3), vec2(-3, 3),    
+    vec2(0, 1), vec2(3, 3), vec2(1, 2), vec2(4, 2), vec2(7, 1)
 ];
 const mountainCount = mountainCoords.length;
 
@@ -198,18 +206,13 @@ function GenerateMountain(x, y)
     
     let minWidth = 1;
     let minHeight = y;
-    let widthMultiplier = 10;
     let heightMultiplier = 2;
 
-    let width = Math.random()*widthMultiplier + minWidth;
-    let height = Math.random()*heightMultiplier + minHeight;
+    let width = minWidth;
+    let height = heightMultiplier + minHeight;
 
-    let widthRandom = Math.random()*minWidth;
-    if (Math.random() < .5)
-    {widthRandom = -widthRandom;}
-
-    points.push(vec2(x - width + widthRandom, y - height)); //left
-    points.push(vec2(x + width + widthRandom, y - height)); //right
+    points.push(vec2(x - width, y - height)); //left
+    points.push(vec2(x + width, y - height)); //right
     colors.push(vec4(139/255/2, 69/255/2, 19/255/2, 1));
     colors.push(vec4(139/255/2, 69/255/2, 19/255/2, 1));
 }
