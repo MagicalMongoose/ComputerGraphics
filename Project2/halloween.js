@@ -59,6 +59,12 @@ function initWebGL()
     projectionMatrixLoc= gl.getUniformLocation(program, "projectionMatrix");
 }
 
+function incrementPointCount(n)
+{
+    //can do safety math here if needed
+    pointCount += n;
+}
+
 function scale4(a, b, c) 
 {
     var result = mat4();
@@ -144,7 +150,7 @@ function GenerateSky()
 function DrawSky()
 {
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4); // body
-    pointCount += 4;
+    incrementPointCount(4);
 }
 
 //4 points
@@ -166,7 +172,7 @@ function GenerateGround()
 function DrawGround()
 {
     gl.drawArrays(gl.TRIANGLE_FAN, pointCount, 4); // body
-    pointCount += 4;
+    incrementPointCount(4);
 }
 
 
@@ -213,14 +219,14 @@ function DrawStars()
 {
     modelViewMatrix = mult(modelViewMatrix, scale4(starSize, starSize*Ratio, 1)); 
     modelViewMatrix = mult(modelViewMatrix, translate(0, -starSize, 0));
-    modelViewMatrix = mult(modelViewMatrix, rotate(9, 0, 0, 1));
+    modelViewMatrix = mult(modelViewMatrix, rotate(0, 0, 0, 1));
     modelViewMatrix = mult(modelViewMatrix, translate(0, +starSize, 0));
     for (var i = 0; i < starCount; i++)
     {
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
         gl.drawArrays(gl.TRIANGLE_FAN, pointCount + i*starPoints, starPoints);
     }
-    pointCount += starPoints*starCount;
+    incrementPointCount(starPoints*starCount);
     modelViewMatrix = mat4();
 }
 
@@ -277,7 +283,7 @@ function DrawMountains()
     {
         gl.drawArrays(gl.TRIANGLES, pointCount + i*mountainPoints, mountainPoints);
     }
-    pointCount += mountainPoints*mountainCount;
+    incrementPointCount(mountainPoints*mountainCount);
 }
 
 //114 points (eyes use same vertices)
@@ -302,11 +308,11 @@ function DrawGhost()
     let eyeBallPointCount = 7;
 
     gl.drawArrays(gl.LINE_LOOP, pointCount, bodyPointCount); // body
-    pointCount += bodyPointCount;
+    incrementPointCount(bodyPointCount);
     gl.drawArrays(gl.LINE_LOOP, pointCount, mouthPointCount);  // mouth
-    pointCount += mouthPointCount;
+    incrementPointCount(mouthPointCount);
     gl.drawArrays(gl.LINE_LOOP, pointCount, nosePointCount);  // nose
-    pointCount += nosePointCount;
+    incrementPointCount(nosePointCount);
     
     gl.drawArrays(gl.LINE_LOOP, pointCount, eyePointCount);  // left eye
     gl.drawArrays(gl.TRIANGLE_FAN, pointCount, eyeBallPointCount);  // left eye ball
@@ -317,8 +323,8 @@ function DrawGhost()
 
     gl.drawArrays(gl.LINE_STRIP, pointCount, eyePointCount);  // right eye
     gl.drawArrays(gl.TRIANGLE_FAN, pointCount, eyeBallPointCount);  // right eye ball
-    pointCount += eyePointCount;
-    pointCount += eyeBallPointCount;
+    incrementPointCount(eyePointCount);
+    incrementPointCount(eyeBallPointCount);
     modelViewMatrix = mat4();
 }
 
@@ -396,7 +402,7 @@ function DrawFullPlanet()
 
     //back rings 
     gl.drawArrays(gl.LINE_STRIP, pointCount, ringDetail*ringCount);
-    pointCount += ringDetail*ringCount
+    incrementPointCount(ringDetail*ringCount)
 
     modelViewMatrix = mat4();
     modelViewMatrix = mult(modelViewMatrix, t);
@@ -405,7 +411,7 @@ function DrawFullPlanet()
 
     //planet ball
     gl.drawArrays(gl.TRIANGLE_FAN, pointCount, planetDetail);
-    pointCount += planetDetail+1;
+    incrementPointCount(planetDetail+1);
 
     //figure out how to use modelViewStack for this 
     modelViewMatrix = mat4();
@@ -416,7 +422,7 @@ function DrawFullPlanet()
 
     //front rings 
     gl.drawArrays(gl.LINE_STRIP, pointCount, ringDetail*ringCount);
-    pointCount += ringDetail*ringCount;
+    incrementPointCount(ringDetail*ringCount);
 }
 
 const bowDetail = 180;
@@ -442,7 +448,7 @@ function DrawBow()
     
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.drawArrays(gl.LINE_STRIP, pointCount, bowDetail);
-    pointCount += bowDetail+1;
+    incrementPointCount(bowDetail+1);
 }
 
 var arrowX = bowX;
@@ -497,7 +503,7 @@ function DrawArrow()
     
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.drawArrays(gl.LINE_STRIP, pointCount, arrowDetail);
-    pointCount += arrowDetail; //make sure this matches the arrow vertices count
+    incrementPointCount(arrowDetail); //make sure this matches the arrow vertices count
 }
 
 const stringDetail = 3;
@@ -526,7 +532,7 @@ function DrawString()
     
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.drawArrays(gl.LINE_STRIP, pointCount, stringDetail);
-    pointCount += stringDetail;
+    incrementPointCount(stringDetail);
 }
 
 const candyDetail = 50;
@@ -611,7 +617,7 @@ function DrawCandy()
     gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
 
     modelViewMatrix = mat4();
-    pointCount += wholeCandyDetail;
+    incrementPointCount(wholeCandyDetail);
 }
 
 //update pointCount to be a simple function to add the vertices to the count,
