@@ -1,5 +1,5 @@
 /** @type {WebGLRenderingContext} */
-var funMode = true;
+var funMode = false;
 var gl;
 var modelViewMatrix=mat4(); // identity
 var modelViewMatrixLoc;
@@ -23,7 +23,7 @@ function main() {
 
     modelViewMatrix = mat4();
     projectionMatrix = ortho(-8, 8, -8, 8, -8, 8);
-    projectionMatrix = mult(projectionMatrix, scale4(0.5, 0.5, 0.5));
+    //projectionMatrix = mult(projectionMatrix, scale4(0.5, 0.5, 0.5));
 
     initWebGL();
 
@@ -103,6 +103,7 @@ function GenerateSky()
         colors.push(vec4(238/256, 130/256, 238/256, 1));
         colors.push(vec4(238/256, 130/256, 238/256, 1)); 
     }
+    //pointCount += points.length - pointCount
 }
 
 function DrawSky()
@@ -247,6 +248,11 @@ function DrawMountains()
 //114 points (eyes use same vertices)
 function DrawGhost() 
 {
+    modelViewMatrix = mat4();
+    modelViewMatrix = mult(modelViewMatrix, translate(-3, -2, 0));
+    modelViewMatrix = mult(modelViewMatrix, scale4(2, 2, 1));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+
     let x = -30;
     let y = 0;
     let scale = 1/20
@@ -310,7 +316,7 @@ function GeneratePlanet()
     for (var i = 0; i < ringCount; i++)
     {GenerateRing(i+ringDistanceOffset, ringColorPresets[i], false);} //issue
     
-    console.log(points.length);
+    //console.log(points.length);
     //planet ball
 	for( var i = 0; i < planetPointCount; i++ ) 
     {
@@ -324,11 +330,11 @@ function GeneratePlanet()
             {colors.push(vec4(0.7, 0.7, 0, 1));}
 	}
     
-    console.log(points.length);
+    //console.log(points.length);
     //front rings
     for (var i = 0; i < ringCount; i++)
     {GenerateRing(i+ringDistanceOffset, ringColorPresets[i], true);} //issue 
-    console.log(points.length);
+    //console.log(points.length);
 }
 
 //do modelViewMatrix here
@@ -492,36 +498,32 @@ function render()
         gl.clear(gl.COLOR_BUFFER_BIT );
         gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-
+        
         //draw ground and sky first
         DrawSky();
-        console.log(pointCount);
+        //console.log(pointCount);
         DrawGround();
-        console.log(pointCount);
+        //console.log(pointCount);
         //draw stars and mountains
         DrawStars();
-        console.log(pointCount);
+        //console.log(pointCount);
         DrawMountains();
-        console.log(pointCount);
+        //console.log(pointCount);
         
         //then, draw ghost
-        modelViewMatrix = mat4();
-        modelViewMatrix = mult(modelViewMatrix, translate(-3, -2, 0));
-        modelViewMatrix = mult(modelViewMatrix, scale4(2, 2, 1));
-        gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
         DrawGhost();
-        console.log(pointCount);
+        //console.log(pointCount);
 
         //then, draw back rings, planet, front rings
         DrawFullPlanet();
-        console.log(pointCount);
+        //console.log(pointCount);
         //add other things, like bow, arrow, spider, flower, tree ...
         DrawBow();
-        console.log(pointCount);
+        //console.log(pointCount);
         DrawArrow();
-        console.log(pointCount);
+        //console.log(pointCount);
         DrawString();
 
-        projectionMatrix = mult(projectionMatrix, rotate(0.5, [1, 1, 1]));
-        requestAnimationFrame(render);
+        //projectionMatrix = mult(projectionMatrix, rotate(0.5, [1, 1, 1])); //funny spin
+        //requestAnimationFrame(render);
 }
