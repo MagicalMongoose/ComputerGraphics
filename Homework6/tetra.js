@@ -116,7 +116,7 @@ window.onload = function init()
     gl.enable(gl.DEPTH_TEST);
 
     //  Load shaders and initialize attribute buffers
-    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
+    program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
     colorTetra();  // created the color cube - point positions and face colors
@@ -240,8 +240,10 @@ window.onload = function init()
     // register the event handler to be called on loading an image
     texture.image.onload = function() {  loadTexture(texture);}
 
+    console.log(texture);
     // Tell the broswer to load an image
-    texture.image.src='aerodynamic.jpg';
+    texture.image.src='aerodynamic.png';
+    console.log(texture);
 
     render();
 }
