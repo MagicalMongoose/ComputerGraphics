@@ -121,6 +121,15 @@ window.onload = function init()
     gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
+    /*
+    var tBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(texCoordsArray), gl.STATIC_DRAW );
+
+    var vTexCoord = gl.getAttribLocation( program, "vTexCoord" );
+    gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vTexCoord );
+    */
     modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
     projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
 
@@ -206,7 +215,43 @@ window.onload = function init()
         render();
     });
 
+    // ==============  Establish Textures =================
+    // create the texture object
+    texture = gl.createTexture();
+
+    // create the image object
+    texture.image = new Image();
+
+    // register the event handler to be called on loading an image
+    texture.image.onload = function() {  loadTexture(texture);}
+
+    // Tell the broswer to load an image
+    texture.image.src='aerodynamic.jpg';
+
     render();
+}
+
+function loadTexture(texture) 
+{
+     // Flip the image's y axis
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+    // Enable texture unit 0
+    gl.activeTexture(gl.TEXTURE0);
+
+    // bind the texture object to the target
+    gl.bindTexture( gl.TEXTURE_2D, texture );
+
+    // set the texture image
+    gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, texture.image );
+
+    // set the texture parameters
+    //gl.generateMipmap( gl.TEXTURE_2D );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+    
+    // set the texture unit 0 the sampler
+    gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
 }
 
 var at = vec3(0, 0, 0);
