@@ -1,8 +1,21 @@
 var canvas, gl;
+var program;
+var image;
 
 var numVertices  = 36;
 var pointsArray = [];
 var colorsArray = [];
+var texCoordsArray = [];
+
+var texture;
+
+var texCoord = 
+[
+    vec2(0, 0),
+    vec2(0, 1),
+    vec2(1, 1),
+    vec2(1, 0)
+];
 
 // Variables that control the orthographic projection bounds.
 var y_max = 5;
@@ -49,10 +62,13 @@ function triangle(a, b, c, color)
 {
     pointsArray.push(vertices[a]);
     colorsArray.push(color);
+    texCoordsArray.push(texCoord[0]);
     pointsArray.push(vertices[b]);
     colorsArray.push(color);
+    texCoordsArray.push(texCoord[1]); 
     pointsArray.push(vertices[c]);
     colorsArray.push(color);
+    texCoordsArray.push(texCoord[2]); 
 }
 
 // Each face is formed with two triangles
@@ -121,7 +137,6 @@ window.onload = function init()
     gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
-    /*
     var tBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(texCoordsArray), gl.STATIC_DRAW );
@@ -129,7 +144,7 @@ window.onload = function init()
     var vTexCoord = gl.getAttribLocation( program, "vTexCoord" );
     gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vTexCoord );
-    */
+    
     modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
     projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
 
