@@ -1,5 +1,5 @@
 /** @type {WebGLRenderingContext} */
-var funMode = false;
+var funMode = true;
 var gl;
 var modelViewMatrix=mat4(); // identity
 var modelViewMatrixLoc;
