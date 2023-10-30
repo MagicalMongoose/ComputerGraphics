@@ -61,7 +61,7 @@ function colorTetra()
     triangle( 2, 7, 1, red );       // front (CHB) red
     triangle( 2, 7, 4, magenta );   // back  (CHE) magenta
     triangle( 4, 2, 1, blue );      // right (ECB) blue
-    triangle( 1, 4, 7, yellow );    // left  (BEH) yellow
+    triangle( 1, 4, 7, green );    // left  (BEH) yellow
 }
 
 // namespace contain all the project information
