@@ -15,6 +15,13 @@ var far = 50;
 var modelViewMatrix, projectionMatrix;
 var modelViewMatrixLoc, projectionMatrixLoc;
 
+const red = vec4(1.0, 0.0, 0.0, 1.0);
+const green = vec4( 0.0, 1.0, 0.0, 1.0 );
+const blue = vec4(0.0, 0.0, 1.0, 1.0);
+const cyan = vec4( 0.0, 1.0, 1.0, 1.0 );
+const magenta = vec4(1.0, 0.0, 1.0, 1.0);
+const yellow = vec4(1.0, 1.0, 0.0, 1.0);
+
 /*
       E ----  F
      /|     / |
@@ -22,55 +29,39 @@ var modelViewMatrixLoc, projectionMatrixLoc;
     | |    |  |
     | G----+- H
     |/     | /
-    C------D/                 */
-var vertices = [
-        vec4(-1,  1,  1, 1.0 ),  // A (0)
-        vec4( 1,  1,  1, 1.0 ),  // B (1)
-        vec4(-1, -1,  1, 1.0 ),  // C (2)
-        vec4( 1, -1,  1, 1.0 ), // D (3)
-        vec4( -1, 1, -1, 1.0 ), // E (4)
-        vec4( 1,  1, -1, 1.0 ), // F (5)
-        vec4( -1,-1, -1, 1.0 ), // G (6)
-        vec4( 1, -1, -1, 1.0 ),  // H (7)
-    ];
+    C------D/                 
+*/
 
-var vertexColors = [
-        vec4( 1.0, 0.0, 0.0, 1.0 ),  // red (0 front)
-        vec4( 0.8, 0.8, 0.2, 1.0 ),  // yellowish-green (1)
-        vec4( 0.0, 1.0, 0.0, 1.0 ),  // green (2)
-        vec4( 0.0, 0.0, 1.0, 1.0 ),  // blue (3 right)
-        vec4( 1.0, 0.0, 1.0, 1.0 ),  // magenta (4)
-        vec4( 0.0, 1.0, 1.0, 1.0 ),  // cyan (5 top)
-        vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow (6 left)
-    ];
+const vertices = 
+[
+    vec4(-1,  1,  1, 1.0 ),  // A (0)
+    vec4( 1,  1,  1, 1.0 ),  // B (1)
+    vec4(-1, -1,  1, 1.0 ),  // C (2)
+    vec4( 1, -1,  1, 1.0 ),  // D (3)
+    vec4( -1, 1, -1, 1.0 ),  // E (4)
+    vec4( 1,  1, -1, 1.0 ),  // F (5)
+    vec4( -1,-1, -1, 1.0 ),  // G (6)
+    vec4( 1, -1, -1, 1.0 ),  // H (7)
+];
 
-
-// quad uses first index to set color for face
-function quad(a, b, c, d) 
+// triangle uses first index to set color for face
+function triangle(a, b, c, color) 
 {
     pointsArray.push(vertices[a]);
-    colorsArray.push(vertexColors[a]);
+    colorsArray.push(color);
     pointsArray.push(vertices[b]);
-    colorsArray.push(vertexColors[a]);
+    colorsArray.push(color);
     pointsArray.push(vertices[c]);
-    colorsArray.push(vertexColors[a]);
-    pointsArray.push(vertices[a]);
-    colorsArray.push(vertexColors[a]);
-    pointsArray.push(vertices[c]);
-    colorsArray.push(vertexColors[a]);
-    pointsArray.push(vertices[d]);
-    colorsArray.push(vertexColors[a]);
+    colorsArray.push(color);
 }
 
 // Each face is formed with two triangles
-function colorCube() 
+function colorTetra() 
 {
-    quad( 0, 1, 3, 2 );  // front(ABDC) red
-    quad( 4, 5, 7, 6 );  // back(EFHG)  magenta
-    quad( 3, 1, 5, 7 );  // right (DBFH) blue
-    quad( 6, 2, 0, 4 );  // left (GCAE) yellow
-    quad( 2, 6, 7, 3 ); // bottom (CGHD) green
-    quad( 5, 4, 0, 1); // top (AEFB) cyan
+    triangle( 2, 7, 1, red );       // front (CHB) red
+    triangle( 2, 7, 4, magenta );   // back  (CHE) magenta
+    triangle( 4, 2, 1, blue );      // right (ECB) blue
+    triangle( 1, 4, 7, yellow );    // left  (BEH) yellow
 }
 
 // namespace contain all the project information
@@ -112,7 +103,7 @@ window.onload = function init()
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
-    colorCube();  // created the color cube - point positions and face colors
+    colorTetra();  // created the color cube - point positions and face colors
 
     var cBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
@@ -224,6 +215,17 @@ var eye = vec3(2, 2, 2);
 
 var eyeX=2, eyeY=2, eyeZ=2; // default eye position input values
 
+function scale4(a, b, c) 
+{
+    var result = mat4();
+    result[0][0] = a;
+    result[1][1] = b;
+    result[2][2] = c;
+    return result;
+}
+
+var scale = 10;
+
 var render = function() {
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -254,6 +256,7 @@ var render = function() {
                 AllInfo.radius*Math.cos(AllInfo.theta));*/
 
     modelViewMatrix = lookAt(eye, at, up);
+    modelViewMatrix = mult(modelViewMatrix, scale4(scale, scale, scale));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
     gl.drawArrays( gl.TRIANGLES, 0, numVertices );
