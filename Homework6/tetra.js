@@ -2,7 +2,7 @@ var canvas, gl;
 var program;
 var image;
 
-var numVertices  = 36;
+var numVertices  = 12;
 var pointsArray = [];
 var colorsArray = [];
 var texCoordsArray = [];
@@ -63,9 +63,11 @@ function triangle(a, b, c, color)
     pointsArray.push(vertices[a]);
     colorsArray.push(color);
     texCoordsArray.push(texCoord[0]);
+
     pointsArray.push(vertices[b]);
     colorsArray.push(color);
     texCoordsArray.push(texCoord[1]); 
+
     pointsArray.push(vertices[c]);
     colorsArray.push(color);
     texCoordsArray.push(texCoord[2]); 
@@ -74,10 +76,10 @@ function triangle(a, b, c, color)
 // Each face is formed with two triangles
 function colorTetra() 
 {
-    triangle( 2, 7, 1, red );       // front (CHB) red
-    triangle( 2, 7, 4, magenta );   // back  (CHE) magenta
-    triangle( 4, 2, 1, blue );      // right (ECB) blue
-    triangle( 1, 4, 7, green );    // left  (BEH) yellow
+    triangle( 1, 2, 7, red );       // front (CHB) red
+    triangle( 2, 4, 7, magenta );   // back  (CHE) magenta
+    triangle( 1, 2, 4, blue );      // right (ECB) blue
+    triangle( 1, 4, 7, green );     // left  (BEH) yellow
 }
 
 // namespace contain all the project information
@@ -264,8 +266,14 @@ function loadTexture(texture)
 
     // set the texture parameters
     //gl.generateMipmap( gl.TEXTURE_2D );
-    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
-    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+    //gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
+    //gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+
+    //using these lines so the image doesn't have to be 256x256
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     
     // set the texture unit 0 the sampler
     gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
@@ -286,7 +294,7 @@ function scale4(a, b, c)
     return result;
 }
 
-var scale = 10;
+var scale = 20;
 
 var render = function() {
 
