@@ -242,10 +242,8 @@ window.onload = function init()
     // register the event handler to be called on loading an image
     texture.image.onload = function() {  loadTexture(texture);}
 
-    console.log(texture);
     // Tell the broswer to load an image
     texture.image.src='aerodynamic.png';
-    console.log(texture);
 
     render();
 }
