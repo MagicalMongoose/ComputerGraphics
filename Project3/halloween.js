@@ -18,7 +18,8 @@ var cmtStack=[];
 var points=[];
 var colors=[];
 
-function main() {
+function main() 
+{
     canvas = document.getElementById( "gl-canvas" );
 
     gl = WebGLUtils.setupWebGL( canvas );
@@ -31,6 +32,15 @@ function main() {
     //projectionMatrix = mult(projectionMatrix, scale4(0.5, 0.5, 0.5));
 
     initWebGL();
+
+    document.addEventListener('keydown', function(event) {
+        if (event.code == 'Space') 
+        { // Space bar is pressed
+            console.log("Space pressed!");
+            console.log(ghostWidth, ghostHeight);
+            animateArrow();
+        }
+    });
 
     render();
 }
@@ -66,7 +76,11 @@ function initWebGL()
 
 function incrementPointCount(n)
 {
-    //can do safety math here if needed
+    if (n < 0) 
+    {
+        console.error("Error: Negative incrementation");
+        return;
+    }
     pointCount += n;
 }
 
@@ -120,8 +134,8 @@ function GeneratePoints()
     GenerateGround();
     GenerateStars();
     GenerateMountains();
-    GenerateGhost();
     GeneratePlanet();
+    GenerateGhost();
     GenerateBow();
     GenerateArrow();
     GenerateString();
@@ -291,48 +305,6 @@ function DrawMountains()
     incrementPointCount(mountainPoints*mountainCount);
 }
 
-//114 points (eyes use same vertices)
-function DrawGhost() 
-{
-    modelViewMatrix = mat4();
-    modelViewMatrix = mult(modelViewMatrix, translate(-3, -2, 0));
-    modelViewMatrix = mult(modelViewMatrix, scale4(2, 2, 1));
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-
-    let x = -30;
-    let y = 0;
-    let scale = 1/20
-    modelViewMatrix = mult(modelViewMatrix, scale4(scale, scale, 1));
-    modelViewMatrix = mult(modelViewMatrix, translate(x, y, 0));
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-
-    let bodyPointCount = 87;
-    let mouthPointCount = 6;
-    let nosePointCount = 5;
-    let eyePointCount = 9;
-    let eyeBallPointCount = 7;
-
-    gl.drawArrays(gl.LINE_LOOP, pointCount, bodyPointCount); // body
-    incrementPointCount(bodyPointCount);
-    gl.drawArrays(gl.LINE_LOOP, pointCount, mouthPointCount);  // mouth
-    incrementPointCount(mouthPointCount);
-    gl.drawArrays(gl.LINE_LOOP, pointCount, nosePointCount);  // nose
-    incrementPointCount(nosePointCount);
-    
-    gl.drawArrays(gl.LINE_LOOP, pointCount, eyePointCount);  // left eye
-    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, eyeBallPointCount);  // left eye ball
-    
-    //copy left eye to right
-    modelViewMatrix = mult(modelViewMatrix, translate(2.6, 0, 0));
-    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-
-    gl.drawArrays(gl.LINE_STRIP, pointCount, eyePointCount);  // right eye
-    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, eyeBallPointCount);  // right eye ball
-    incrementPointCount(eyePointCount);
-    incrementPointCount(eyeBallPointCount);
-    modelViewMatrix = mat4();
-}
-
 const ringDetail = 180;
 const ringCount = 4;
 const ringDistanceOffset = 3;
@@ -428,6 +400,58 @@ function DrawFullPlanet()
     //front rings 
     gl.drawArrays(gl.LINE_STRIP, pointCount, ringDetail*ringCount);
     incrementPointCount(ringDetail*ringCount);
+}
+
+var ghostX = -30;
+var ghostY = 0;
+var ghostWidth;
+var ghostHeight;
+//114 points (eyes use same vertices)
+function DrawGhost() 
+{
+    modelViewMatrix = mat4();
+    modelViewMatrix = mult(modelViewMatrix, translate(-3, -2, 0));
+    modelViewMatrix = mult(modelViewMatrix, scale4(2, 2, 1));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+
+    
+    let scale = 1/20
+    modelViewMatrix = mult(modelViewMatrix, scale4(scale, scale, 1));
+    modelViewMatrix = mult(modelViewMatrix, translate(ghostX, ghostY, 0));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+
+    let bodyPointCount = 87;
+    let mouthPointCount = 6;
+    let nosePointCount = 5;
+    let eyePointCount = 9;
+    let eyeBallPointCount = 7;
+
+    gl.drawArrays(gl.LINE_LOOP, pointCount, bodyPointCount); // body
+    // Calculate the width and height of the ghost using the points
+    ghostWidth = Math.max(...points.slice(pointCount, pointCount + bodyPointCount).map(p => p[0])) - Math.min(...points.slice(pointCount, pointCount + bodyPointCount).map(p => p[0]));
+    ghostHeight = Math.max(...points.slice(pointCount, pointCount + bodyPointCount).map(p => p[1])) - Math.min(...points.slice(pointCount, pointCount + bodyPointCount).map(p => p[1]));
+    incrementPointCount(bodyPointCount);
+
+    gl.drawArrays(gl.LINE_LOOP, pointCount, mouthPointCount);  // mouth
+    incrementPointCount(mouthPointCount);
+    
+    gl.drawArrays(gl.LINE_LOOP, pointCount, nosePointCount);  // nose
+    incrementPointCount(nosePointCount);
+    
+    gl.drawArrays(gl.LINE_LOOP, pointCount, eyePointCount);  // left eye
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, eyeBallPointCount);  // left eye ball
+    
+    //copy left eye to right
+    modelViewMatrix = mult(modelViewMatrix, translate(2.6, 0, 0));
+    gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+
+    gl.drawArrays(gl.LINE_STRIP, pointCount, eyePointCount);  // right eye
+    gl.drawArrays(gl.TRIANGLE_FAN, pointCount, eyeBallPointCount);  // right eye ball
+    incrementPointCount(eyePointCount);
+    incrementPointCount(eyeBallPointCount);
+    modelViewMatrix = mat4();
+    
+    
 }
 
 const bowDetail = 180;
@@ -625,6 +649,47 @@ function DrawCandy()
     incrementPointCount(wholeCandyDetail);
 }
 
+var speed = 1;
+function animateArrow() 
+{
+    if (arrowY < 1) 
+    {
+        arrowY += speed; // speed is the rate of movement
+        var scale = 0.9;
+        modelViewMatrix = mult(modelViewMatrix, scale4(scale, scale, scale));
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+        handleCollision();
+        requestAnimationFrame(animateArrow);
+    }
+    else
+    {
+        arrowY = bowY;
+    }
+}
+
+function handleCollision() 
+{
+    if (checkCollision()) 
+    {
+        // Stop the animation
+        cancelAnimationFrame(animateArrow);
+        // Display a message
+        alert("Ghost hit!");
+    }
+}
+
+function checkCollision() 
+{
+    if (arrowX >= ghostX && 
+        arrowX <= ghostX + ghostWidth && 
+        arrowY >= ghostY && 
+        arrowY <= ghostY + ghostHeight) 
+        {
+            return true;
+        }
+    return false;
+}
+
 function render() 
 {
         gl.clear(gl.COLOR_BUFFER_BIT );
@@ -635,8 +700,8 @@ function render()
         DrawGround();
         DrawStars();
         DrawMountains();
-        DrawGhost();
         DrawFullPlanet();
+        DrawGhost();
         DrawBow();
         DrawArrow();
         DrawString();
