@@ -78,10 +78,10 @@ function triangle(a, b, c, color, textureIndex)
 // Each face is formed with two triangles
 function colorTetra() 
 {
-    triangle(1, 2, 7, red, 0);       // front (BCH) red
+    triangle(7, 1, 2, red, 0);       // front (BCH) red
     triangle(2, 4, 7, magenta, 1);   // back  (CEH) magenta
-    triangle(1, 2, 4, blue, 2);      // right (BCE) blue
-    triangle(1, 4, 7, green, 3);     // left  (BEH) yellow
+    triangle(2, 4, 1, blue, 2);      // right (BCE) blue
+    triangle(7, 1, 4, green, 3);     // left  (BEH) yellow
 }
 
 // namespace contain all the project information
