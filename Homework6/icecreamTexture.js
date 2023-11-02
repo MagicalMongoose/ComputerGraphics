@@ -453,7 +453,7 @@ function EstablishTextures()
     texture2.image = new Image();
 
     // Tell the broswer to load an image
-    texture2.image.src='obama.png';
+    texture2.image.src='aerodynamic.png';
 
     // register the event handler to be called on loading an image
     texture2.image.onload = function() {  loadTexture(texture2, gl.TEXTURE1); }

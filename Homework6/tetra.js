@@ -7,8 +7,10 @@ var pointsArray = [];
 var colorsArray = [];
 var texCoordsArray = [];
 
-var texture;
+var textures = [];
+var textureSources = ['aerodynamic.png', 'obama.png', 'milkshake.png', 'doge.png']; 
 
+//4 corners of each texture
 var texCoord = 
 [
     vec2(0, 0),
@@ -58,7 +60,7 @@ const vertices =
 ];
 
 // triangle uses first index to set color for face
-function triangle(a, b, c, color) 
+function triangle(a, b, c, color, textureIndex) 
 {
     pointsArray.push(vertices[a]);
     colorsArray.push(color);
@@ -76,10 +78,10 @@ function triangle(a, b, c, color)
 // Each face is formed with two triangles
 function colorTetra() 
 {
-    triangle( 1, 2, 7, red );       // front (CHB) red
-    triangle( 2, 4, 7, magenta );   // back  (CHE) magenta
-    triangle( 1, 2, 4, blue );      // right (ECB) blue
-    triangle( 1, 4, 7, green );     // left  (BEH) yellow
+    triangle(1, 2, 7, red, 0);       // front (BCH) red
+    triangle(2, 4, 7, magenta, 1);   // back  (CEH) magenta
+    triangle(1, 2, 4, blue, 2);      // right (BCE) blue
+    triangle(1, 4, 7, green, 3);     // left  (BEH) yellow
 }
 
 // namespace contain all the project information
@@ -121,7 +123,7 @@ window.onload = function init()
     program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
-    colorTetra();  // created the color cube - point positions and face colors
+    colorTetra();  // created the color tetra - point positions and face colors
 
     var cBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
@@ -232,29 +234,80 @@ window.onload = function init()
         render();
     });
 
+
     // ==============  Establish Textures =================
+    /*
+    for (var i = 0; i < textureSources.length; i++) 
+    {
+        textures[i] = gl.createTexture();
+        textures[i].image = new Image();
+        //textures[i].image.onload = function() {  loadTexture(textures[i]);}
+        
+        textures[i].image.onload = (function(texture) 
+        {
+            return function() 
+            {
+                loadTexture(texture);
+            }
+        })(textures[i]);
+        
+        textures[i].image.src = textureSources[i];
+    }
+    */
+    
+    //turn this all into a loop with an array
+
+    //texture0
     // create the texture object
-    texture = gl.createTexture();
-
+    texture0 = gl.createTexture();
     // create the image object
-    texture.image = new Image();
-
+    texture0.image = new Image();
     // register the event handler to be called on loading an image
-    texture.image.onload = function() {  loadTexture(texture);}
-
+    texture0.image.onload = function() {loadTexture(texture0, gl.TEXTURE0);}
     // Tell the broswer to load an image
-    texture.image.src='aerodynamic.png';
+    texture0.image.src=textureSources[0];
 
+    //texture1
+    // create the texture object
+    texture1 = gl.createTexture();
+    // create the image object
+    texture1.image = new Image();
+    // register the event handler to be called on loading an image
+    texture1.image.onload = function() {loadTexture(texture1, gl.TEXTURE1);}
+    // Tell the broswer to load an image
+    texture1.image.src=textureSources[1];
+
+    //texture2
+    // create the texture object
+    texture2 = gl.createTexture();
+    // create the image object
+    texture2.image = new Image();
+    // register the event handler to be called on loading an image
+    texture2.image.onload = function() {loadTexture(texture2, gl.TEXTURE2);}
+    // Tell the broswer to load an image
+    texture2.image.src=textureSources[2];
+    
+    //texture3
+    // create the texture object
+    texture3 = gl.createTexture();
+    // create the image object
+    texture3.image = new Image();
+    // register the event handler to be called on loading an image
+    texture3.image.onload = function() {loadTexture(texture3, gl.TEXTURE3);}
+    // Tell the broswer to load an image
+    texture3.image.src=textureSources[3];
+
+    
     render();
 }
 
-function loadTexture(texture) 
+function loadTexture(texture, whichTexture)
 {
      // Flip the image's y axis
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
-    // Enable texture unit 0
-    gl.activeTexture(gl.TEXTURE0);
+    // Enable texture
+    gl.activeTexture(gl.activeTexture(whichTexture));
 
     // bind the texture object to the target
     gl.bindTexture( gl.TEXTURE_2D, texture );
@@ -326,6 +379,10 @@ var render = function() {
     modelViewMatrix = lookAt(eye, at, up);
     modelViewMatrix = mult(modelViewMatrix, scale4(scale, scale, scale));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
+    var length = textureSources.length;
+    for(var i = 0; i < length; i++) 
+    {
+        gl.uniform1i(gl.getUniformLocation(program, "texture"), i);
+        gl.drawArrays( gl.TRIANGLES, i * numVertices / length, numVertices / length);
+    }
 }
