@@ -5,6 +5,7 @@ Project 3
 */
 /** @type {WebGLRenderingContext} */
 var funMode = true;
+var debugOutput = true;
 var gl;
 var modelViewMatrix = mat4(); // identity
 var modelViewMatrixLoc;
@@ -38,11 +39,25 @@ function main()
     {
         if (event.key == 's' || event.key == 'S')
         {
-            console.log("S pressed!");
+            lastKeyPressed = "S";
             ghostX = Math.random() * 100 - 50;
             ghostY = Math.random() * 20 - 10;
-            console.log(ghostX, ghostY);
             visibleGhost = 1;
+            printDebug();
+            requestAnimationFrame(render);
+        }
+    });
+
+    //despawn ghost
+    document.addEventListener('keydown', function (event)
+    {
+        if (event.key == 'b' || event.key == 'B')
+        {
+            lastKeyPressed = "B";
+            visibleGhost = 0;
+            resetArrow();
+            resetBow();
+            printDebug();
             requestAnimationFrame(render);
         }
     });
@@ -53,7 +68,7 @@ function main()
     {
         if (event.key == 'l' || event.key == 'L')
         {
-            console.log("L pressed!");
+            lastKeyPressed = "L";
             if (bowAngle < maxBowAngle)
             {
                 bowAngle += 1;
@@ -64,7 +79,7 @@ function main()
 
         if (event.key == 'r' || event.key == 'R')
         {
-            console.log("R pressed!");
+            lastKeyPressed = "R";
             if (bowAngle > -maxBowAngle)
             {
                 bowAngle -= 1;
@@ -73,7 +88,7 @@ function main()
             }
         }
 
-        console.log("bowAngle, arrowAngle:", bowAngle, arrowAngle);
+        printDebug();
         requestAnimationFrame(render);
     });
 
@@ -82,14 +97,27 @@ function main()
     {
         if (event.key == 'f' || event.key == 'F') 
         {
-            console.log("F pressed!");
-            console.log("arrowX, arrowY, arrowAngle, arrowScale:", arrowX, arrowY, arrowAngle, arrowScale);
+            lastKeyPressed = "F";
             animateArrow();
+            printDebug();
             requestAnimationFrame(render);
         }
     });
 
     render();
+}
+
+var lastKeyPressed = "?";
+function printDebug()
+{
+    if (debugOutput == true)
+    {
+        console.log("Last key pressed:", lastKeyPressed);
+        console.log("ghostX, ghostY:", ghostX, ghostY);
+        console.log("arrowX, arrowY, arrowScale:", arrowX, arrowY, arrowScale);
+        console.log("bowAngle, arrowAngle:", bowAngle, arrowAngle);
+        console.log("");
+    }
 }
 
 function initWebGL() 
@@ -744,13 +772,21 @@ function animateArrow()
         handleCollision();
         requestAnimationFrame(render);
     }
-    else //reset arrow
-    {
-        arrowX = 0;
-        arrowY = starterArrowY;
-        arrowAngle = bowAngle + 90;
-        arrowScale = 1;
-    }
+    else
+    { resetArrow(); }
+}
+
+function resetArrow()
+{
+    arrowX = 0;
+    arrowY = starterArrowY;
+    arrowAngle = bowAngle + 90;
+    arrowScale = 1;
+}
+
+function resetBow()
+{
+    bowAngle = 0;
 }
 
 function handleCollision() 
