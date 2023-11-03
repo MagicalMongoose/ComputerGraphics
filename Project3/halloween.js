@@ -42,7 +42,7 @@ function main()
             lastKeyPressed = "S";
             ghostX = Math.random() * 100 - 50;
             ghostY = Math.random() * 20 - 10;
-            visibleGhost = 1;
+            visibleGhost = true;
             printDebug();
             requestAnimationFrame(render);
         }
@@ -54,7 +54,7 @@ function main()
         if (event.key == 'b' || event.key == 'B')
         {
             lastKeyPressed = "B";
-            visibleGhost = 0;
+            visibleGhost = false;
             resetArrow();
             resetBow();
             printDebug();
@@ -480,7 +480,7 @@ var ghostX = -30;
 var ghostY = 0;
 var ghostWidth;
 var ghostHeight;
-var visibleGhost = 0;
+var visibleGhost = false;
 //114 points (eyes use same vertices)
 function DrawGhost() 
 {
@@ -490,7 +490,7 @@ function DrawGhost()
     let eyePointCount = 9;
     let eyeBallPointCount = 7;
     let ghostTotalPoints = bodyPointCount + mouthPointCount + nosePointCount + eyePointCount + eyeBallPointCount;
-    if (visibleGhost == 1)
+    if (visibleGhost)
     {
         modelViewMatrix = mat4();
         modelViewMatrix = mult(modelViewMatrix, scale4(2, 2, 1));
