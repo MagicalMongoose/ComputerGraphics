@@ -35,11 +35,12 @@ function main()
 
     document.addEventListener('keydown', function (event)
     {
-        if (event.code == 'Space') 
+        if (event.key == 'f' || event.key == 'F') 
         { // Space bar is pressed
-            console.log("Space pressed!");
-            console.log(ghostWidth, ghostHeight);
+            console.log("F pressed!");
+            console.log("arrowX, arrowY, arrowAngle:", arrowX, arrowY, arrowAngle);
             animateArrow();
+            requestAnimationFrame(render);
         }
     });
 
@@ -61,8 +62,12 @@ function main()
         if (event.key == 'l' || event.key == 'L')
         {
             console.log("L pressed!");
-            bowAngle -= 1;
-            console.log(bowAngle);
+            bowAngle += 1;
+            if (arrowY == starterArrowY)
+            {
+                arrowAngle += 1;
+            }
+            console.log("bowAngle, arrowAngle:", bowAngle, arrowAngle);
             requestAnimationFrame(render);
         }
     });
@@ -72,8 +77,12 @@ function main()
         if (event.key == 'r' || event.key == 'R')
         {
             console.log("R pressed!");
-            bowAngle += 1;
-            console.log(bowAngle);
+            bowAngle -= 1;
+            if (arrowY == starterArrowY)
+            {
+                arrowAngle -= 1;
+            }
+            console.log("bowAngle, arrowAngle:", bowAngle, arrowAngle);
             requestAnimationFrame(render);
         }
     });
@@ -528,13 +537,15 @@ function DrawBow()
 }
 
 var arrowX = 0;
-var arrowY = bowY + .75;
+const starterArrowY = bowY + .75;
+var arrowY = starterArrowY;
 const arrowLength = 2;
 const arrowDetail = 20;
 const shortLine = 0.25;
 const topFletchling = -2 / 3;
 const midFletchling = -3 / 4;
 const botFletchling = -4 / 5;
+var arrowAngle = 90;
 
 function GenerateArrow()
 {
@@ -576,6 +587,11 @@ function DrawArrow()
 {
     modelViewMatrix = mat4();
     modelViewMatrix = mult(modelViewMatrix, translate(arrowX, arrowY, 0));
+
+    if (arrowY == starterArrowY)
+    { modelViewMatrix = mult(modelViewMatrix, rotate(bowAngle, 0, 0, 1)); }
+    else //if arrow is flying
+    { modelViewMatrix = mult(modelViewMatrix, rotate(arrowAngle, 0, 0, 1)); }
 
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.drawArrays(gl.LINE_STRIP, pointCount, arrowDetail);
@@ -701,21 +717,32 @@ function DrawCandy()
     incrementPointCount(wholeCandyDetail);
 }
 
-var speed = 1;
+var arrowSpeed = 0.5;
+var arrowMaxHeight = 1;
+//when F is pressed
 function animateArrow() 
 {
-    if (arrowY < 1) 
+    if (arrowY < arrowMaxHeight) 
     {
-        arrowY += speed; // speed is the rate of movement
-        var scale = 0.9;
-        modelViewMatrix = mult(modelViewMatrix, scale4(scale, scale, scale));
+        arrowX += arrowSpeed * Math.cos(arrowAngle * Math.PI / 180);
+        arrowY += arrowSpeed * Math.sin(arrowAngle * Math.PI / 180);
+        var scale = 0.5;
+        modelViewMatrix = mult(modelViewMatrix, scale4(scale, scale, 1));
         gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+        DrawArrow();
+
+        //not working
+        GenerateString();
+        DrawString();
+
+
         handleCollision();
-        requestAnimationFrame(animateArrow);
+        requestAnimationFrame(render);
     }
     else
     {
-        arrowY = bowY;
+        arrowX = 0;
+        arrowY = starterArrowY;
     }
 }
 
