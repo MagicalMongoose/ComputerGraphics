@@ -715,42 +715,42 @@ function DrawCandy()
 
 
 	modelViewMatrix = mult(modelViewMatrix, s);
-	modelViewMatrix = mult(modelViewMatrix, translate(70, -60, 1));
+	modelViewMatrix = mult(modelViewMatrix, translate(70, -60, 0));
 	modelViewMatrix = mult(modelViewMatrix, rotate(20, 0, 0, 1));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 	gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
 
 	modelViewMatrix = mat4();
 	modelViewMatrix = mult(modelViewMatrix, s);
-	modelViewMatrix = mult(modelViewMatrix, translate(75, -60, 1));
+	modelViewMatrix = mult(modelViewMatrix, translate(75, -60, 0));
 	modelViewMatrix = mult(modelViewMatrix, rotate(-30, 0, 0, 1));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 	gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
 
 	modelViewMatrix = mat4();
 	modelViewMatrix = mult(modelViewMatrix, s);
-	modelViewMatrix = mult(modelViewMatrix, translate(80, -70, 1));
+	modelViewMatrix = mult(modelViewMatrix, translate(80, -70, 0));
 	modelViewMatrix = mult(modelViewMatrix, rotate(30, 0, 0, 1));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 	gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
 
 	modelViewMatrix = mat4();
 	modelViewMatrix = mult(modelViewMatrix, s);
-	modelViewMatrix = mult(modelViewMatrix, translate(50, -70, 1));
+	modelViewMatrix = mult(modelViewMatrix, translate(50, -70, 0));
 	modelViewMatrix = mult(modelViewMatrix, rotate(-30, 0, 0, 1));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 	gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
 
 	modelViewMatrix = mat4();
 	modelViewMatrix = mult(modelViewMatrix, s);
-	modelViewMatrix = mult(modelViewMatrix, translate(55, -60, 1));
+	modelViewMatrix = mult(modelViewMatrix, translate(55, -60, 0));
 	modelViewMatrix = mult(modelViewMatrix, rotate(80, 0, 0, 1));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 	gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
 
 	modelViewMatrix = mat4();
 	modelViewMatrix = mult(modelViewMatrix, s);
-	modelViewMatrix = mult(modelViewMatrix, translate(63, -70, 1));
+	modelViewMatrix = mult(modelViewMatrix, translate(63, -70, 0));
 	modelViewMatrix = mult(modelViewMatrix, rotate(10, 0, 0, 1));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 	gl.drawArrays(gl.TRIANGLE_FAN, pointCount, wholeCandyDetail);
@@ -828,11 +828,9 @@ function render()
 	DrawArrow();
 	DrawString();
 	DrawCandy();
-	//console.log(points);
 	pointCount = 0;
-	//requestAnimationFrame(render);
 
 	//funny spin
-	//projectionMatrix = mult(projectionMatrix, rotate(0.5, [1, 1, 1])); 
+	//projectionMatrix = mult(projectionMatrix, rotate(0.5, [0, 0, 1]));
 	//requestAnimationFrame(render);
 }
