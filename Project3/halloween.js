@@ -64,43 +64,44 @@ function main()
 
 	//rotate bow
 	let maxBowAngle = 60;
+	let rotationSpeed = 2;
 	document.addEventListener('keydown', function (event)
 	{
-		if (event.key == 'l' || event.key == 'L')
+		if (event.key == 'a' || event.key == 'A')
 		{
-			keyPressed = "L";
+			keyPressed = "A";
 			if (bowAngle < maxBowAngle)
 			{
-				bowAngle += 1;
+				bowAngle += rotationSpeed;
 				if (arrowY == starterArrowY)
-				{ arrowAngle += 1; }
+				{ arrowAngle += rotationSpeed; }
 			}
 		}
 
-		if (event.key == 'r' || event.key == 'R')
+		if (event.key == 'd' || event.key == 'D')
 		{
-			keyPressed = "R";
+			keyPressed = "D";
 			if (bowAngle > -maxBowAngle)
 			{
-				bowAngle -= 1;
+				bowAngle -= rotationSpeed;
 				if (arrowY == starterArrowY)
-				{ arrowAngle -= 1; }
+				{ arrowAngle -= rotationSpeed; }
 			}
 		}
 
 		printDebug();
+		//resetArrow();
 		requestAnimationFrame(render);
 	});
 
 	//fire bow
 	document.addEventListener('keydown', function (event)
 	{
-		if (event.key == 'f' || event.key == 'F') 
+		if (event.code == 'Space') 
 		{
 			keyPressed = "F";
 			animateArrow();
 			printDebug();
-			requestAnimationFrame(render);
 		}
 	});
 
@@ -114,6 +115,7 @@ function printDebug()
 	{
 		console.log("Last key pressed:", keyPressed);
 		console.log("ghostX, ghostY:", ghostX, ghostY);
+		console.log("ghostWidth, ghostHeight:", ghostWidth, ghostHeight);
 		console.log("arrowX, arrowY, arrowScale:", arrowX, arrowY, arrowScale);
 		console.log("bowAngle, arrowAngle:", bowAngle, arrowAngle);
 		console.log("");
@@ -575,6 +577,7 @@ const midFletchling = -3 / 4;
 const botFletchling = -4 / 5;
 var arrowAngle = 90;
 var arrowScale = 1;
+var arrowShrinkRate = 0.97; //very sensitive value
 
 function GenerateArrow()
 {
@@ -623,7 +626,7 @@ function DrawArrow()
 	{
 		//bug: if bow is rotated while arrow is moving, arrow continues to shrink
 		modelViewMatrix = mult(modelViewMatrix, rotate(arrowAngle - 90, 0, 0, 1));
-		arrowScale *= 0.96; //very sensitive value
+		arrowScale *= arrowShrinkRate;
 		modelViewMatrix = mult(modelViewMatrix, scale4(arrowScale, arrowScale, 1));
 	}
 
@@ -753,7 +756,7 @@ function DrawCandy()
 	incrementPointCount(wholeCandyDetail);
 }
 
-var arrowSpeed = 0.5;
+var arrowSpeed = 0.1;
 var arrowMaxHeight = 0;
 //when F is pressed
 function animateArrow() 
@@ -762,15 +765,14 @@ function animateArrow()
 	{
 		arrowX += arrowSpeed * Math.cos(arrowAngle * Math.PI / 180);
 		arrowY += arrowSpeed * Math.sin(arrowAngle * Math.PI / 180);
-		DrawArrow();
 
-		//not working
-		GenerateString();
-		DrawString();
-
-
+		if (arrowY >= arrowMaxHeight)
+		{
+			return;
+		}
+		render();
 		handleCollision();
-		requestAnimationFrame(render);
+		requestAnimationFrame(animateArrow);
 	}
 	else
 	{ resetArrow(); }
