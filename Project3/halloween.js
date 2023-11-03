@@ -802,14 +802,9 @@ function handleCollision()
 
 function checkCollision() 
 {
-    if (arrowX >= ghostX &&
-        arrowX <= ghostX + ghostWidth &&
-        arrowY >= ghostY &&
-        arrowY <= ghostY + ghostHeight) 
-    {
-        return true;
-    }
-    return false;
+    //returns true or false based on collision formula
+    return arrowX >= ghostX && arrowX <= ghostX + ghostWidth &&
+        arrowY >= ghostY && arrowY <= ghostY + ghostHeight;
 }
 
 function render() 
