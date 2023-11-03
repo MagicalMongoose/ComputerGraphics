@@ -2,6 +2,9 @@
 Drew Lickman
 Professor Li
 Project 3
+Bonuses:
+	Press B to reset the scene
+	Arrow collision with ghost (buggy)
 */
 /** @type {WebGLRenderingContext} */
 var funMode = true;
