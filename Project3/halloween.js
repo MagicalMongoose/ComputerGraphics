@@ -67,6 +67,17 @@ function main()
         }
     });
 
+    document.addEventListener('keydown', function (event)
+    {
+        if (event.key == 'r' || event.key == 'R')
+        {
+            console.log("R pressed!");
+            bowAngle += 1;
+            console.log(bowAngle);
+            requestAnimationFrame(render);
+        }
+    });
+
     render();
 }
 
@@ -483,15 +494,18 @@ function DrawGhost()
 }
 
 const bowDetail = 180;
-const bowX = 0;
-const bowY = -4;
+const bowX = -Math.PI; //bowX displaced due to being Math.PI into cosine wave
+const bowY = -5;
 var bowAngle = 0;
+var bowWidth = Math.abs(2 * Math.PI);
+var bowHeight = Math.abs(Math.cos(Math.PI) - Math.cos(3 * Math.PI));
 
 function GenerateBow()
 {
     for (var i = Math.PI; i < 3 * Math.PI; i += (Math.PI / bowDetail) * 2)
     {
         let x = i;
+        //bowWidth += 1;
         let y = Math.cos(i);
         points.push(vec2(x, y));
         colors.push(vec4(1, 1, .5, 1)); //yellow
@@ -501,17 +515,20 @@ function GenerateBow()
 function DrawBow()
 {
     modelViewMatrix = mat4();
-    modelViewMatrix = mult(modelViewMatrix, translate(bowX - Math.PI, bowY - 1, 0));
+    modelViewMatrix = mult(modelViewMatrix, translate(bowX, bowY, 0));
     modelViewMatrix = mult(modelViewMatrix, scale4(.5, .5, 1));
+
+    modelViewMatrix = mult(modelViewMatrix, translate(bowWidth, bowHeight, 0));
     modelViewMatrix = mult(modelViewMatrix, rotate(bowAngle, 0, 0, 1));
+    modelViewMatrix = mult(modelViewMatrix, translate(-bowWidth, -bowHeight, 0));
 
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.drawArrays(gl.LINE_STRIP, pointCount, bowDetail);
     incrementPointCount(bowDetail + 1);
 }
 
-var arrowX = bowX;
-var arrowY = bowY;
+var arrowX = 0;
+var arrowY = bowY + .75;
 const arrowLength = 2;
 const arrowDetail = 20;
 const shortLine = 0.25;
@@ -570,13 +587,14 @@ const arrowShot = false;
 
 function GenerateString()
 {
-    let flatString = bowY / 3.3;
-    points.push(vec2(-arrowLength / 2, flatString));
+    let flatString = bowY + 4;
+    let stringLoc = 1;
+    points.push(vec2(-stringLoc, flatString));
     if (arrowY > bowY + 1)
-        points.push(vec2(bowX - arrowLength / 2, flatString)); //make string flat if arrow is shot
+        points.push(vec2(0, flatString)); //make string flat if arrow is shot
     else
-        points.push(vec2(bowX, arrowY + (arrowLength)));
-    points.push(vec2(arrowLength / 2, flatString));
+        points.push(vec2(0, arrowY + (arrowLength * 1.25)));
+    points.push(vec2(stringLoc, flatString));
 
     for (var i = 0; i < stringDetail; i++)
     {
@@ -587,8 +605,11 @@ function GenerateString()
 function DrawString()
 {
     modelViewMatrix = mat4();
-    modelViewMatrix = mult(modelViewMatrix, translate(bowX, bowY, 0));
+    modelViewMatrix = mult(modelViewMatrix, translate(0, bowY + 0.75, 0));
+
+    //modelViewMatrix = mult(modelViewMatrix, translate(bowWidth, bowHeight, 0));
     modelViewMatrix = mult(modelViewMatrix, rotate(bowAngle, 0, 0, 1));
+    //modelViewMatrix = mult(modelViewMatrix, translate(-bowWidth, -bowHeight, 0));
 
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.drawArrays(gl.LINE_STRIP, pointCount, stringDetail);
