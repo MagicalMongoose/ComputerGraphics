@@ -2,6 +2,18 @@
 
 <head>
    <title>Halloween Game</title>
+   <style>
+      tr:nth-child(odd) {
+         background-color: #dddddd;
+      }
+
+      td,
+      th {
+         border: 1px solid #dddddd;
+         text-align: left;
+         padding: 8px;
+      }
+   </style>
 </head>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
@@ -42,8 +54,27 @@ void main() {
    <canvas id="gl-canvas" width="830" height="512">
       Oops ... your browser doesn't support the HTML5 canvas element
    </canvas>
-   <h5>Controls: A D (Aim left or right)</h5>
-   <h5>Controls: SPACE (Fire arrow)</h5>
+   <br>
+
+   <h4>Controls: <br></h4>
+   <table>
+      <tr>
+         <td>A D</td>
+         <td>(Aim left or right)</td>
+      </tr>
+      <tr>
+         <td>SPACE</td>
+         <td>(Fire arrow)</td>
+      </tr>
+      <tr>
+         <td>B</td>
+         <td>(Reset scene)</td>
+      </tr>
+      <tr>
+         <td>S</td>
+         <td>(Spawn enemy)</td>
+      </tr>
+   </table>
 
 </body>
 

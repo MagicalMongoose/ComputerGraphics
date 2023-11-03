@@ -55,8 +55,8 @@ function main()
 		{
 			keyPressed = "B";
 			ghostIsVisible = false;
-			resetArrow();
 			resetBow();
+			resetArrow();
 			printDebug();
 			requestAnimationFrame(render);
 		}
@@ -577,7 +577,7 @@ const midFletchling = -3 / 4;
 const botFletchling = -4 / 5;
 var arrowAngle = 90;
 var arrowScale = 1;
-var arrowShrinkRate = 0.97; //very sensitive value
+var arrowShrinkRate = 0.98; //very sensitive value
 
 function GenerateArrow()
 {
@@ -758,7 +758,7 @@ function DrawCandy()
 
 var arrowSpeed = 0.1;
 var arrowMaxHeight = 0;
-//when F is pressed
+//when Space is pressed
 function animateArrow() 
 {
 	if (arrowY < arrowMaxHeight) 
