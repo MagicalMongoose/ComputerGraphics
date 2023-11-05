@@ -102,7 +102,7 @@ function main()
 	{
 		if (event.code == 'Space') 
 		{
-			keyPressed = "F";
+			keyPressed = "Space";
 			animateArrow();
 			printDebug();
 		}
@@ -828,7 +828,7 @@ function render()
 	DrawArrow();
 	DrawString();
 	DrawCandy();
-	pointCount = 0;
+	pointCount = 0; //reset the point count so animations work 
 
 	//funny spin
 	//projectionMatrix = mult(projectionMatrix, rotate(0.5, [0, 0, 1]));
