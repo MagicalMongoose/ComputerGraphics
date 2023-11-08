@@ -114,8 +114,8 @@ var render = function ()
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     mvMatrix = lookAt(eye, at, up);
-    //pMatrix = ortho(-3, 3, -3, 3, 2, 6);
-    pMatrix = ortho(-2, 2, -4, 4, 0, 10);
+    pMatrix = ortho(-3, 3, -3, 3, 2, 10);
+    //pMatrix = ortho(0, 4, 0, 3, 2, 10);
 
     var t = mult(pMatrix, mvMatrix);
     console.log("projection*modelview");
