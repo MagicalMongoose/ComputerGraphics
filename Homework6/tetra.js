@@ -60,7 +60,7 @@ const vertices =
 ];
 
 // triangle uses first index to set color for face
-function triangle(a, b, c, color, textureIndex) 
+function triangle(a, b, c, color) 
 {
     pointsArray.push(vertices[a]);
     colorsArray.push(color);
